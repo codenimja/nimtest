@@ -23,7 +23,7 @@ jobs:
       - name: Generate test reports
         run: nimble test_reports
       - name: Upload test reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5
         with:
           name: test-reports-${{ matrix.nim-version }}
           path: test_report*.json

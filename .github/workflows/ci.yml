@@ -77,7 +77,7 @@ jobs:
         nim c -r examples/test_error_reporting.nim
 
     - name: Upload test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.nim-version }}
@@ -171,7 +171,7 @@ jobs:
         find docs -name "*.md" -exec grep -l "http" {} \; | head -5 | xargs -I {} sh -c 'echo "Checking {}"; grep -o "http[^)]*" {} | head -3 | xargs -I url sh -c "curl -s -o /dev/null -w \"%{http_code}\" url | grep -q 200 && echo \"OK: url\" || echo \"BROKEN: url\""' || true
 
     - name: Upload documentation
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: nimtest-docs
         path: docs/generated/
@@ -219,7 +219,7 @@ jobs:
         tar -czf nimtest-${{ github.sha }}.tar.gz nimtest-release
 
     - name: Upload release archive
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: nimtest-release
         path: nimtest-${{ github.sha }}.tar.gz
