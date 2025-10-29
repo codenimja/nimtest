@@ -1,0 +1,37 @@
+stages:
+  - test
+  - report
+
+.test_template: &test_definition
+  image: nimlang/nim:latest
+  before_script:
+    - nimble install -y
+  script:
+    - nimble test
+    - nimble run_all_tests
+
+test_nim_stable:
+  <<: *test_definition
+  stage: test
+
+test_nim_1.6:
+  image: nimlang/nim:1.6
+  before_script:
+    - nimble install -y
+  script:
+    - nimble test
+    - nimble run_all_tests
+  stage: test
+
+generate_reports:
+  <<: *test_definition
+  stage: report
+  script:
+    - nimble test_reports
+  artifacts:
+    paths:
+      - test_report*.json
+      - test_report*.xml
+      - test_report*.md
+  only:
+    - main

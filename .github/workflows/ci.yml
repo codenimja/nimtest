@@ -1,0 +1,256 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'LICENSE'
+  pull_request:
+    branches: [ main, develop ]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'LICENSE'
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        nim-version: ['2.0.x', stable, devel]
+        exclude:
+          # setup-nim-action doesn't support devel on Windows
+          - os: windows-latest
+            nim-version: devel
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache nimble dependencies
+      id: cache-nimble
+      uses: actions/cache@v4
+      with:
+        path: ~/.nimble
+        key: ${{ runner.os }}-nimble-${{ matrix.nim-version }}-${{ hashFiles('nimble.nimble') }}
+        restore-keys: |
+          ${{ runner.os }}-nimble-${{ matrix.nim-version }}-
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: ${{ matrix.nim-version }}
+        repo-token: ${{ github.token }}
+
+    - name: Verify Nim installation
+      run: |
+        nim --version
+        nimble --version
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Build nimtest framework
+      run: nim c src/nimtest.nim
+
+    - name: Run framework tests
+      run: nim c -r examples/test_all.nim
+
+    - name: Run core tests
+      run: nim c -r examples/core/test_registry_init.nim
+
+    - name: Run CLI tests
+      run: nim c -r examples/cli/test_cli_create.nim
+
+    - name: Run performance tests
+      run: nim c -r examples/performance/test_performance_registry.nim
+
+    - name: Generate test reports
+      run: |
+        nim c -r examples/test_reporting_demo.nim
+        nim c -r examples/test_error_reporting.nim
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.nim-version }}
+        path: |
+          comprehensive_test_report.json
+          error_handling_report.json
+          *.json
+          *.xml
+          *.md
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache nimble dependencies
+      id: cache-nimble
+      uses: actions/cache@v4
+      with:
+        path: ~/.nimble
+        key: ubuntu-latest-nimble-stable-${{ hashFiles('nimble.nimble') }}
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: stable
+        repo-token: ${{ github.token }}
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Check code formatting
+      run: |
+        # Try to install and use nimpretty for format checking
+        nimble install nimpretty || echo "nimpretty not available, skipping format check"
+        if command -v nimpretty &> /dev/null; then
+          echo "Checking code formatting..."
+          nimpretty --check src/nimtest/*.nim || echo "Formatting issues found"
+        else
+          echo "nimpretty not available, skipping format check"
+        fi
+
+    - name: Check for compilation warnings
+      run: |
+        nim c --warnings:on --hints:on src/nimtest.nim
+
+    - name: Validate nimble.nimble
+      run: nimble check
+
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache nimble dependencies
+      id: cache-nimble
+      uses: actions/cache@v4
+      with:
+        path: ~/.nimble
+        key: ubuntu-latest-nimble-stable-${{ hashFiles('nimble.nimble') }}
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: stable
+        repo-token: ${{ github.token }}
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Generate documentation
+      run: |
+        # Create docs directory if it doesn't exist
+        mkdir -p docs/generated
+
+        # Generate HTML documentation for all modules
+        nim doc --out:docs/generated/ --project src/nimtest.nim || echo "Documentation generation completed with warnings"
+
+        # Generate individual module docs
+        nim doc --out:docs/generated/helpers.html src/nimtest/helpers.nim
+        nim doc --out:docs/generated/reporting.html src/nimtest/reporting.nim
+        nim doc --out:docs/generated/test_config.html src/nimtest/test_config.nim
+
+    - name: Validate documentation links
+      run: |
+        # Check for broken links in docs (basic check)
+        find docs -name "*.md" -exec grep -l "http" {} \; | head -5 | xargs -I {} sh -c 'echo "Checking {}"; grep -o "http[^)]*" {} | head -3 | xargs -I url sh -c "curl -s -o /dev/null -w \"%{http_code}\" url | grep -q 200 && echo \"OK: url\" || echo \"BROKEN: url\""' || true
+
+    - name: Upload documentation
+      uses: actions/upload-artifact@v4
+      with:
+        name: nimtest-docs
+        path: docs/generated/
+        retention-days: 30
+
+  release:
+    needs: [test, lint, docs]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache nimble dependencies
+      id: cache-nimble
+      uses: actions/cache@v4
+      with:
+        path: ~/.nimble
+        key: ubuntu-latest-nimble-stable-${{ hashFiles('nimble.nimble') }}
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: stable
+        repo-token: ${{ github.token }}
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Run release tests
+      run: |
+        nim c -r examples/test_all.nim
+        nim c -r examples/test_reporting_demo.nim
+
+    - name: Create release archive
+      run: |
+        mkdir nimtest-release
+        cp -r src nimtest-release/
+        cp -r docs nimtest-release/
+        cp -r examples nimtest-release/
+        cp README.md nimtest-release/
+        cp LICENSE nimtest-release/
+        cp nimble.nimble nimtest-release/
+        tar -czf nimtest-${{ github.sha }}.tar.gz nimtest-release
+
+    - name: Upload release archive
+      uses: actions/upload-artifact@v4
+      with:
+        name: nimtest-release
+        path: nimtest-${{ github.sha }}.tar.gz
+
+  publish:
+    needs: release
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(github.event.head_commit.message, 'release:')
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache nimble dependencies
+      id: cache-nimble
+      uses: actions/cache@v4
+      with:
+        path: ~/.nimble
+        key: ubuntu-latest-nimble-stable-${{ hashFiles('nimble.nimble') }}
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: stable
+        repo-token: ${{ github.token }}
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Publish to nimble
+      env:
+        NIMBLE_API_KEY: ${{ secrets.NIMBLE_API_KEY }}
+      run: |
+        nimble publish
