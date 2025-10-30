@@ -1,0 +1,136 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache nimble dependencies
+      id: cache-nimble
+      uses: actions/cache@v4
+      with:
+        path: ~/.nimble
+        key: ubuntu-latest-nimble-stable-${{ hashFiles('nimble.nimble') }}
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: stable
+        repo-token: ${{ github.token }}
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Run full test suite
+      run: |
+        nim c -r examples/test_all.nim
+        nim c -r examples/test_reporting_demo.nim
+
+    - name: Generate release documentation
+      run: |
+        mkdir -p docs/generated
+        nim doc --out:docs/generated/ --project src/nimtest.nim
+
+    - name: Create release archive
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "Creating release archive for version $VERSION"
+
+        mkdir nimtest-$VERSION
+        cp -r src nimtest-$VERSION/
+        cp -r docs nimtest-$VERSION/
+        cp -r examples nimtest-$VERSION/
+        cp README.md nimtest-$VERSION/
+        cp LICENSE nimtest-$VERSION/
+        cp nimble.nimble nimtest-$VERSION/
+
+        tar -czf nimtest-$VERSION.tar.gz nimtest-$VERSION
+        zip -r nimtest-$VERSION.zip nimtest-$VERSION
+
+    - name: Create GitHub Release
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        IS_PRERELEASE=false
+
+        # Check if this is a prerelease
+        if [[ "$GITHUB_REF" == *"rc"* ]] || [[ "$GITHUB_REF" == *"beta"* ]] || [[ "$GITHUB_REF" == *"alpha"* ]]; then
+          IS_PRERELEASE=true
+        fi
+
+        # Create release notes
+        cat > release_notes.md << 'EOF'
+        ## Changes
+
+        See [CHANGELOG.md](CHANGELOG.md) for detailed changes.
+
+        ## Installation
+
+        ```bash
+        nimble install nimtest
+        ```
+
+        ## Quick Start
+
+        ```nim
+        import nimtest
+
+        suite "My Tests":
+          test "basic functionality":
+            check 1 + 1 == 2
+        ```
+        EOF
+
+        # Create the release
+        gh release create "$GITHUB_REF" \
+          --title "Release $GITHUB_REF" \
+          --notes-file release_notes.md \
+          --draft=false \
+          --prerelease=$IS_PRERELEASE \
+          "nimtest-$VERSION.tar.gz" \
+          "nimtest-$VERSION.zip"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    needs: release
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache nimble dependencies
+      id: cache-nimble
+      uses: actions/cache@v4
+      with:
+        path: ~/.nimble
+        key: ubuntu-latest-nimble-stable-${{ hashFiles('nimble.nimble') }}
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: stable
+        repo-token: ${{ github.token }}
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Publish to nimble
+      env:
+        NIMBLE_API_KEY: ${{ secrets.NIMBLE_API_KEY }}
+      run: |
+        echo "Publishing to nimble package registry..."
+        nimble publish
+
+    - name: Verify publication
+      run: |
+        echo "Verifying package was published..."
+        nimble search nimtest | grep -q nimtest && echo "Package published successfully" || echo "Package publication verification failed"

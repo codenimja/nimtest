@@ -1,0 +1,119 @@
+---
+name: Pull Request
+description: Create a pull request for nimtest
+title: "[PR] "
+labels: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing to nimtest! Please fill out this template to help us review your changes.
+
+  - type: dropdown
+    id: pr-type
+    attributes:
+      label: Type of Change
+      description: What type of change does this PR introduce?
+      options:
+        - Bug fix (non-breaking change which fixes an issue)
+        - New feature (non-breaking change which adds functionality)
+        - Breaking change (fix or feature that would cause existing functionality to not work as expected)
+        - Documentation update
+        - Test improvements
+        - Code refactoring
+        - Performance improvement
+        - Security enhancement
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe your changes in detail.
+      placeholder: "What does this PR do? Why is it needed?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation and Context
+      description: Why is this change required? What problem does it solve?
+      placeholder: "What problem does this solve? How does it improve nimtest?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: changes
+    attributes:
+      label: Changes Made
+      description: List the specific changes you made.
+      placeholder: |
+        - Added new assertion function `assertFileModifiedAfter`
+        - Updated TestContext to track modification times
+        - Added examples in `examples/core/`
+        - Updated documentation in `docs/API.md`
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing
+      description: How have you tested these changes?
+      placeholder: |
+        - [ ] Unit tests pass
+        - [ ] Integration tests pass
+        - [ ] CLI tests pass
+        - [ ] Performance tests pass
+        - [ ] Cross-platform testing (Linux/macOS/Windows)
+        - [ ] Documentation builds
+        - [ ] Examples run successfully
+    validations:
+      required: true
+
+  - type: textarea
+    id: breaking-changes
+    attributes:
+      label: Breaking Changes
+      description: Does this PR introduce any breaking changes?
+      placeholder: |
+        If yes, describe the breaking changes and migration path:
+
+        **Breaking Change:** `runCliCommand` now returns a named tuple instead of unnamed tuple.
+
+        **Migration:** Change `let (output, code) = runCliCommand(args)` to `let result = runCliCommand(args); echo result.output, result.exitCode`
+    validations:
+      required: false
+
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please check all items that apply.
+      options:
+        - label: My code follows the existing code style and conventions
+        - label: I have added/updated tests for my changes
+        - label: I have updated the documentation accordingly
+        - label: I have tested my changes on multiple platforms (Linux, macOS, Windows)
+        - label: All existing tests pass
+        - label: I have added an example demonstrating the new functionality
+        - label: My changes do not break backward compatibility
+        - label: I have considered the performance impact of my changes
+        - label: I have run the linter and fixed any issues
+
+  - type: textarea
+    id: related-issues
+    attributes:
+      label: Related Issues
+      description: Link to any related issues or pull requests.
+      placeholder: "Fixes #123, Related to #456"
+
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: Additional Notes
+      description: Any additional information or context.
+      placeholder: "Any additional context, considerations, or follow-up work needed."

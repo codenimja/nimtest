@@ -1,0 +1,16 @@
+# Nim
+nimcache/
+*.exe
+*.out
+*.app
+
+# Test artifacts
+test_report.*
+nimtest_temp_*
+junit.xml
+report.*
+
+# IDE
+.idea/
+.vscode/
+*.swp

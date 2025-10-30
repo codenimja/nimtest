@@ -1,0 +1,93 @@
+---
+name: Feature Request
+description: Suggest a new feature or enhancement for nimtest
+title: "[FEATURE] "
+labels: ["enhancement", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature for nimtest! Your ideas help make the framework better for everyone.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: A brief description of the feature you'd like to see.
+      placeholder: "What feature would you like to add to nimtest?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem/Use Case
+      description: What problem does this feature solve? What's the use case?
+      placeholder: "Describe the problem this feature would solve or the use case it would enable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like this feature to work?
+      placeholder: "Describe how you envision this feature working."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Have you considered any alternative approaches?
+      placeholder: "Describe any alternative solutions or workarounds you've considered."
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What type of feature is this?
+      options:
+        - Testing Utilities (new assertion types, helpers)
+        - Resource Management (TestContext improvements)
+        - CLI Testing (command execution, output validation)
+        - Reporting (new formats, analytics)
+        - Component Testing (UI/component framework support)
+        - Performance Testing (benchmarking, profiling)
+        - Configuration (setup, customization)
+        - Documentation (guides, examples)
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Nice to have
+        - Would be helpful
+        - Important for my use case
+        - Critical/blocking my work
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, code examples, or references.
+      placeholder: "Any additional information, code examples, or references that would help understand this feature request."
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please check all that apply.
+      options:
+        - label: I have searched for similar feature requests and couldn't find any
+        - label: This feature would benefit other nimtest users
+        - label: I'm willing to help implement this feature (optional)
