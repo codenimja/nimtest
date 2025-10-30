@@ -7,18 +7,6 @@ srcDir        = "src"
 
 requires "nim >= 2.0.0"
 
-# Optional but recommended for nimble.directory
-keywords      = "testing, unittest, benchmark, junit, markdown, progress-bar, cli-testing"
-homepage      = "https://github.com/codenimja/nimtest"
-
-installMsg    = """
-Quick start:
-  import nimtest/api
-  var ctx = createTestContext()
-  # …write tests…
-  ctx.cleanup()
-"""
-
 task test, "Run the complete nimtest test suite":
   exec "nim c -r tests/test_core.nim"
   exec "nim c -r tests/test_helpers.nim"
