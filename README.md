@@ -33,6 +33,7 @@ finally:
 - [Documentation](./docs/)
 - [Changelog](./CHANGELOG.md)
 - [Contributing](./docs/CONTRIBUTING.md)
+- [Handling Nim Contributions](./docs/NIM_CONTRIBUTIONS.md)
 ```
 
 ## Features
