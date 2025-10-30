@@ -1,54 +1,61 @@
 # nimtest — The Only Testing Framework You'll Ever Need
 
-```nim
-import nimtest/api   # ← ONE IMPORT TO RULE THEM ALL
-```
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/codenimja/nimtest/ci.yml?branch=main&style=flat-square)](https://github.com/codenimja/nimtest/actions)
+[![nimble](https://img.shields.io/badge/nimble-v0.1.0-blue.svg?style=flat-square)](https://github.com/nim-lang/nimble)
+
+nimtest is a comprehensive testing package for Nim projects, providing utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and rich reporting.
 
 ## Install
+
 ```bash
 nimble install nimtest
 ```
 
-## Quick Start
+## Quick Example
+
 ```nim
+import nimtest/api   # ← ONE IMPORT TO RULE THEM ALL
+
 var ctx = createTestContext()
 try:
-  let d = createTempTestDir(ctx, "demo")
-  let f = createTestFile(ctx, d, "hello.txt", "world")
+  let dir = createTempTestDir(ctx, "demo")
+  let f = createTestFile(ctx, dir, "hello.txt", "world")
   discard assertFileContains(f, "world")
 finally:
   ctx.cleanup()
 ```
 
 ## Features
-- Auto-cleanup via `TestContext`
-- 4 report formats (Console, JSON, JUnit XML, Markdown)
+
+- Auto-cleanup via TestContext
+- 4 report formats (including JUnit XML)
 - 5 animated progress bars
 - Full CLI testing
-- Benchmarks with `benchmark()`
-- `nimble test` ready
-- Full docs in [`docs/`](./docs/)
-
-## Links
-- [Documentation](./docs/)
-- [Changelog](./CHANGELOG.md)
-- [Contributing](./docs/CONTRIBUTING.md)
-- [Handling Nim Contributions](./docs/NIM_CONTRIBUTIONS.md)
-```
-
-## Features
-
-- Automatic resource management with TestContext
-- File system testing utilities
-- CLI testing support
-- Performance benchmarking
-- Multiple report formats (console, JSON, JUnit XML, Markdown)
-- Progress bars
-- Cross-platform support
+- Benchmarks with benchmark()
+- nimble test ready
 
 ## Documentation
 
-See [docs/](docs/) for comprehensive documentation, API reference, and examples.
+This documentation covers all aspects of the nimtest framework:
+
+### Getting Started
+- [Quick Start Guide](QUICKSTART.md) - Get up and running in 5 minutes
+- [Configuration Guide](CONFIGURATION.md) - Complete setup and configuration
+- [User Guide](USER_GUIDE.md) - Complete usage instructions
+
+### Core Documentation
+- [API Reference](API.md) - Complete API documentation
+- [Architecture](ARCHITECTURE.md) - Framework design and architecture
+- [Best Practices](BEST_PRACTICES.md) - Recommended patterns and practices
+
+### Examples and Guides
+- [Examples and Patterns](EXAMPLES.md) - Common testing scenarios
+
+### Community
+- [Contribution Guidelines](CONTRIBUTING.md) - How to contribute to the project
+- [CI/CD Guide](CI_CD_GUIDE.md) - Integration with CI/CD systems
 
 ## Core Concepts
 
@@ -84,196 +91,192 @@ Comprehensive utilities for file and directory testing:
 
 ```nim
 # Basic assertions (return bool, throw exception on failure)
-discard assertFileExists("config.json")
-discard assertDirExists("output/")
-discard assertFileContains("log.txt", "SUCCESS")
-
-# Advanced assertions  
-discard assertFileNotExists("deleted.txt")
-discard assertFileHasSize("data.bin", 1024)
-discard assertFileModifiedAfter("file.txt", getTime())
+discard assertFileExists("path/to/file")
+discard assertFileContains("path/to/file", "expected content")
+discard assertDirExists("path/to/directory")
 ```
 
 ### Performance Testing
 
-Timing and benchmarking utilities:
+Built-in benchmarking and timing utilities:
 
 ```nim
-# Measure single operation
-let duration = measureTime("database query"):
-  proc() = 
-    # database.executeQuery("SELECT * FROM users")
+# Time a code block
+let duration = measureTime("operation"):
+  proc() =
+    # Your code here
+    sleep(100)
 
-# Benchmark multiple iterations
-let benchResults = benchmark("string operations", 1000):
-  proc() = 
-    var s = ""
-    for i in 0..100:
-      s &= "test"
+# Run benchmarks
+let results = benchmark("test operation", 1000):
+  proc() =
+    # Code to benchmark
+    discard 1 + 1
+```
 
-echo "Average: ", benchResults.avg, "s, Min: ", benchResults.min, "s, Max: ", benchResults.max, "s"
+### Progress Visualization
+
+Five different animated progress bar styles:
+
+```nim
+let bar = newProgressBar(pbsGlobe, total = 100, message = "Processing...")
+for i in 0..99:
+  # Do work
+  bar.update(i + 1)
+bar.finish("Complete!")
 ```
 
 ### Reporting
 
-Comprehensive test reporting with multiple output formats:
+Multiple output formats for different use cases:
 
 ```nim
-# Create test report
-var report = newTestSuiteReport("My Test Suite")
-
-# Add test results
-let result = newTestResult("my test", true, 0.005, "Test passed")
-addResult(report, result)
-
-# Generate different report formats
-generateConsoleReport(report)
-let jsonFile = saveReport(report, rfJson, "report.json")
-let junitFile = saveReport(report, rfJunit, "report.xml")
-let markdownFile = saveReport(report, rfMarkdown, "report.md")
+var report = newTestSuiteReport("My Tests")
+# ... add test results
+generateConsoleReport(report)  # Human-readable output
+saveReport(report, rfJunit, "junit.xml")  # CI/CD integration
+saveReport(report, rfJson, "report.json")  # Programmatic access
 ```
 
-### Progress Bars
+## Framework Architecture
 
-Visual feedback for long-running operations with 5 different styles:
+nimtest is organized into focused modules:
 
+```
+src/nimtest/
+├── api.nim          # Public API facade - import this
+├── core.nim         # TestContext, basic utilities
+├── helpers.nim      # Advanced assertions, extended utilities
+├── reporting.nim    # Test results, multiple output formats
+├── progress.nim     # Progress bar implementations
+└── config.nim       # Project configuration constants
+```
+
+## Contributing
+
+We welcome contributions! See our [Contribution Guidelines](CONTRIBUTING.md) for details on how to get involved.
+
+## License
+
+MIT License - see [LICENSE](../LICENSE) for details.
+    # Use nimtest utilities in your tests
+    let testDir = ctx.createTempTestDir("basic_test")
+    let testFile = testDir / "sample.txt"
+    writeFile(testFile, "Hello, nimtest!")
+
+    # Verify with assertions
+    assertFileExists(testFile)
+    assertFileContains(testFile, "Hello, nimtest!")
+
+    # Test passes if no assertion fails
+    check true == true
+```
+
+### Key Framework Components
+
+#### Resource Management
 ```nim
-# Create progress bar
-let bar = newProgressBar(pbsGlobe, width = 40, total = 100, message = "Running...")
+# Create test context for automatic cleanup
+var ctx = createTestContext()
+defer: ctx.cleanup()
 
-# Update progress during execution (optimized to avoid spam)
-for i in 0..<100:
-  # Your operation here
-  sleep(10)  # Simulate work
-  update(bar, i + 1, &"Processing {i + 1}/100")  # Using optimized update
+# Create temporary resources
+let testDir = ctx.createTempTestDir("my_test")
+```
+
+#### File System Assertions
+```nim
+assertFileExists("path/to/file")
+assertDirExists("path/to/directory")
+assertFileContains("config.json", "expected_content")
+assertOutputContains(output, "expected_text")
+```
+
+#### CLI Testing
+```nim
+# Example usage with command output stored in a variable
+let output = "Version: 1.0.0\nBuild Date: 2025-01-01"
+discard assertOutputContains(output, "1.0.0")
+```
+
+#### Performance Testing
+```nim
+measureTime("operation name"):
+  performOperation()
+
+benchmark("operation", 1000):
+  performOperation()
+```
+
+#### Progress Bars
+```nim
+# Create progress bar with different styles
+let bar = newProgressBar(pbsGlobe, width = 40, total = 100, message = "Processing...")
+
+# Update progress
+bar.updateProgress(50, "Halfway done...")
+bar.display()
 
 # Complete progress bar
-finish(bar, "All tasks completed!")
-```
-
-## API Overview
-
-### Core Module
-- `createTestContext()` - Create a new test context for resource management
-- `cleanup(ctx)` - Clean up all registered resources
-- File operations: `createTestFile()`, `createTestDir()`, `createTempTestDir()`
-- Assertions: `assertFileExists()`, `assertFileContains()`, `assertDirExists()`, etc.
-- Performance: `measureTime()`, etc.
-
-### Helpers Module
-- Advanced assertions: `assertFileNotExists()`, `assertFileHasSize()`, etc.
-- File operations: `createTestFile()`, `createTestDir()`
-- Performance: `benchmark()`, `runTestWithTimeout()`
-- Advanced: `assertThrows()`
-
-### Reporting Module
-- `newTestSuiteReport(name)` - Create a new test suite report
-- `newTestResult()` - Create individual test result
-- Report formats: `generateConsoleReport()`, `generateJsonReport()`, `generateJunitReport()`, `generateMarkdownReport()`
-- `saveReport()` - Save reports to files in different formats
-- `runTestsWithProgress()` - Run tests with visual progress feedback
-- `getStatistics()`, `getFailedResults()`, `sortResults()` - Report analysis functions
-
-### Progress Module
-- Progress bars with various styles: `newProgressBar()`, `update()`, `display()`, `finish()`
-
-## Project Structure
-
-```
-nimtest.nimble              # Nimble package configuration
-src/nimtest/                # Framework source code
-├── api.nim                 # Public API facade (recommended import)
-├── core.nim                # Core functionality (TestContext, basic assertions)
-├── reporting.nim           # Test reporting with multiple output formats
-├── config.nim              # Optional configuration
-├── progress.nim            # Progress bar utilities
-└── helpers.nim             # Extended helper functions
-docs/                       # Complete documentation
-examples/                   # Example implementations
-tests/                      # Framework tests
-```
-
-## Examples
-
-### Basic File Operation Test
-
-```nim
-import nimtest/api
-import std/[os, times]
-
-# Create test context for resource management
-var ctx = createTestContext()
-try:
-  # Create temporary directory and file
-  let testDir = createTempTestDir(ctx, "file_test")
-  let testFile = createTestFile(ctx, testDir, "config.json", """{"debug": true}""")
-  
-  # Validate file operations
-  discard assertFileExists(testFile)
-  discard assertFileContains(testFile, "debug")
-  discard assertFileContains(testFile, "true")
-  
-  echo "File operations test passed!"
-  
-finally:
-  ctx.cleanup()
-```
-
-### Performance Benchmarking
-
-```nim
-import nimtest/api
-
-# Benchmark string concatenation
-let results = benchmark("string operations", 10000):
-  proc() = 
-    var s = ""
-    for i in 0..100:
-      s &= "test"
-
-echo "String operations benchmark completed"
-echo "Average time: ", results.avg, " seconds"
-echo "Min time: ", results.min, " seconds" 
-echo "Max time: ", results.max, " seconds"
-```
-
-### CI-Ready Testing with JUnit Output
-
-```nim
-import nimtest/api
-
-var report = newTestSuiteReport("CI Test Suite")
-
-# Add some test results
-addResult(report, newTestResult("test_addition", true, 0.001, "Addition works correctly"))
-addResult(report, newTestResult("test_failing_example", false, 0.005, "Expected failure"))
-
-finish(report)
-
-# Generate JUnit XML for CI/CD systems
-let junitFile = saveReport(report, rfJunit, "test-results.xml")
-echo "JUnit report saved to: ", junitFile
+bar.finish("All done!")
 ```
 
 ## Configuration
 
-The framework provides optional configuration through the config module:
+Configure nimtest by editing `src/nimtest/config.nim` in your project:
 
 ```nim
-import nimtest/api
-
-# Optionally override default configuration
-ProjectName = "myapp"
+const
+  ProjectName* = "yourproject"          # Your project name
+  ProjectDisplayName* = "Your Project"  # Human-readable name
+  TempDirPrefix* = "nimtest_temp"       # Prefix for temporary directories
+  TestSuiteVersion* = "0.1.0"           # Version for test reports
 ```
+
+## Test Organization
+
+Organize your tests in a logical directory structure:
+
+```
+tests/
+├── unit/                    # Unit tests for individual functions/modules
+├── integration/             # Integration tests for multiple components
+├── performance/             # Performance and benchmark tests
+├── cli/                     # CLI command tests (if applicable)
+├── fixtures/                # Test data and fixture files
+├── helpers.nim              # Shared test utilities specific to your project
+└── test_all.nim             # Main test runner
+```
+
+## CI/CD Integration
+
+nimtest is designed to work well in CI/CD environments:
+
+- Compatible with GitHub Actions, GitLab CI, and other systems
+- Cross-platform support (Linux, Windows, macOS)
+- Multiple report formats (JSON, JUnit XML) for CI integration
+- Console output formatted for CI logs
+
+## Best Practices
+
+1. **Always use TestContext**: Create and clean up contexts properly for resource management
+2. **Use setup/teardown**: Initialize resources in setup, clean up in teardown
+3. **Use descriptive test names**: Make test names clear and specific
+4. **Test one thing per test**: Keep tests focused on a single functionality
+5. **Use meaningful assertions**: Provide clear messages for failed assertions
+6. **Clean up resources**: Always ensure temporary files and directories are cleaned up
+7. **Use performance utilities**: Measure and track performance of critical operations
+8. **Generate reports**: Use reporting utilities to track test results over time
+
+## Dependencies
+
+- `nim >= 2.0.0`
+- `std/unittest` (built-in)
+- `std/os` (built-in)
+- `std/osproc` (built-in)
+- `std/json` (built-in)
+- `std/parseutils` (built-in)
 
 ## License
 
-MIT License - See LICENSE file for details.
-
-## Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines on how to contribute to this project.
-
-## Support
-
-For support and questions, please open an issue in the repository or consult the comprehensive documentation in the `docs/` directory.
+MIT License - See LICENSE file for details
