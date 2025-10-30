@@ -83,9 +83,9 @@ assertOutputContains(output, "expected_text")
 
 #### CLI Testing
 ```nim
-let (output, exitCode) = runCliCommand("--version")
-check exitCode == 0
-assertOutputContains(output, "1.0.0")
+# Example usage with command output stored in a variable
+let output = "Version: 1.0.0\nBuild Date: 2025-01-01"
+discard assertOutputContains(output, "1.0.0")
 ```
 
 #### Performance Testing
@@ -152,8 +152,7 @@ The nimtest framework provides these key utilities:
 - `assertFileModifiedAfter()` - Assert file was modified after specific time
 
 ### CLI Testing Utilities
-- `runCliCommand()` - Execute CLI commands and capture output and exit code
-- `runCliCommandInDir()` - Execute CLI commands in a specific directory
+(Note: CLI testing utilities have been removed to keep the framework lightweight and focused on core testing functionality)
 
 ### Performance Utilities
 - `measureTime()` - Measure execution time of operations with formatted output

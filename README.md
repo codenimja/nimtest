@@ -1,14 +1,11 @@
-# nimtest - The Premier Testing Framework for Nim
+# nimtest
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg)](https://nim-lang.org/)
-[![Build Status](https://github.com/codenimja/nimtest/workflows/CI/badge.svg)](https://github.com/codenimja/nimtest/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/codenimja/nimtest/ci.yml?branch=main&style=flat-square)](https://github.com/codenimja/nimtest/actions)
+[![nimble](https://img.shields.io/badge/nimble-v0.1.0-blue.svg?style=flat-square)](https://github.com/codenimja/nimtest)
 
-**nimtest** is the most comprehensive and professional testing framework designed exclusively for Nim projects. As the only dedicated Nim testing suite, it provides unparalleled testing capabilities with automatic resource management, rich reporting, and cross-platform support.
-
-**Keywords:** nim testing, nim test framework, nim unit tests, nim integration tests, nim cli testing, nim performance benchmarks, nim test suite, nim testing tools, nim development, nim programming
-
-nimtest is a comprehensive testing framework for Nim projects, providing utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and rich reporting.
+nimtest is a comprehensive testing package for Nim projects, providing utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and rich reporting.
 
 ## Install
 
