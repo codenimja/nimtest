@@ -16,17 +16,38 @@ nimble install nimtest
 ## Usage
 
 ```nim
-import nimtest/api
+# nimtest — The Only Testing Framework You'll Ever Need
 
+```nim
+import nimtest/api   # ← ONE IMPORT TO RULE THEM ALL
+```
+
+## Install
+
+```bash
+nimble install nimtest
+```
+
+## Quick Example
+
+```nim
 var ctx = createTestContext()
 try:
-  let tempDir = createTempTestDir(ctx, "test")
-  let testFile = createTestFile(ctx, tempDir, "test.txt", "content")
-  
-  discard assertFileExists(testFile)
-  discard assertFileContains(testFile, "content")
+  let dir = createTempTestDir(ctx, "demo")
+  let f = createTestFile(ctx, dir, "hello.txt", "world")
+  discard assertFileContains(f, "world")
 finally:
   ctx.cleanup()
+```
+
+## Features
+
+- Auto-cleanup via TestContext
+- 4 report formats (including JUnit XML)
+- 5 animated progress bars
+- Full CLI testing
+- Benchmarks with benchmark()
+- nimble test ready
 ```
 
 ## Features

@@ -1,45 +1,16 @@
-# Nim compiler outputs
+# Nim
 nimcache/
-nimblecache/
-htmldocs/
-
-# Compiled binaries
 *.exe
-*.dll
-*.so
-*.dylib
-test_suite_all
-test_all
-test_runner
+*.out
+*.app
 
 # Test artifacts
-*.log
-*.out
-test_*
+test_report.*
+nimtest_temp_*
+junit.xml
+report.*
 
-# IDE files
-.vscode/
+# IDE
 .idea/
+.vscode/
 *.swp
-*.swo
-*~
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Temporary files
-tmp/
-temp/
-*.tmp
-
-# Build artifacts
-bin/
-build/
-dist/
-
-# Package manager
-.nimble/
-
-# Hidden files that should never be tracked
-.qwen
