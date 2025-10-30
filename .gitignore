@@ -1,0 +1,45 @@
+# Nim compiler outputs
+nimcache/
+nimblecache/
+htmldocs/
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+test_suite_all
+test_all
+test_runner
+
+# Test artifacts
+*.log
+*.out
+test_*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+bin/
+build/
+dist/
+
+# Package manager
+.nimble/
+
+# Hidden files that should never be tracked
+.qwen

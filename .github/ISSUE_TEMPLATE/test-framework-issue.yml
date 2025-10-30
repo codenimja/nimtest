@@ -1,0 +1,133 @@
+---
+name: Test Framework Issue
+description: Report issues with nimtest's testing capabilities or framework behavior
+title: "[TEST] "
+labels: ["test-framework", "triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This template is for issues specifically related to nimtest's testing framework behavior, patterns, or capabilities.
+
+  - type: input
+    id: version
+    attributes:
+      label: nimtest Version
+      description: What version of nimtest are you using?
+      placeholder: "e.g., 0.2.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What type of testing issue are you experiencing?
+      options:
+        - Test Isolation Problems (tests affecting each other)
+        - Resource Management Issues (cleanup, temporary files)
+        - Assertion Failures (unexpected test failures)
+        - Performance Issues (slow tests, memory leaks)
+        - CLI Testing Problems (command execution, output capture)
+        - Component Testing Issues (metadata, file generation)
+        - Reporting Problems (output formats, analytics)
+        - Configuration Issues (setup, customization)
+        - Documentation Problems (examples, guides)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Issue Description
+      description: Describe the testing issue you're experiencing.
+      placeholder: "What testing behavior are you seeing that's problematic?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: test-code
+    attributes:
+      label: Test Code
+      description: Provide the test code that's causing issues.
+      placeholder: |
+        ```nim
+        import nimtest
+        import std/unittest
+
+        suite "Problematic Test":
+          var ctx: TestContext
+
+          setup:
+            ctx = createTestContext()
+
+          teardown:
+            ctx.cleanup()
+
+          test "problematic behavior":
+            # Your test code here
+        ```
+      render: nim
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Testing Behavior
+      description: What should the test framework do in this situation?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Testing Behavior
+      description: What does nimtest actually do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current Workaround
+      description: How are you currently working around this issue?
+      placeholder: "If you have a workaround, please describe it."
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severely does this impact your testing?
+      options:
+        - Minor inconvenience
+        - Significant issue (affects multiple tests)
+        - Major blocker (prevents testing certain functionality)
+        - Critical (breaks core testing capabilities)
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Test Environment
+      description: Details about your testing environment.
+      placeholder: |
+        - Nim version:
+        - Operating System:
+        - Project structure:
+        - Test configuration (test_config.nim settings):
+        - Any custom test setup:
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please check all that apply.
+      options:
+        - label: I have tried the latest version of nimtest
+        - label: I have checked existing issues and documentation
+        - label: I can reproduce this issue consistently
+        - label: This issue affects nimtest's core testing capabilities

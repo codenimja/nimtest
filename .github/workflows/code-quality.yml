@@ -1,0 +1,159 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: stable
+        repo-token: ${{ github.token }}
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Run security audit
+      run: |
+        # Check for potential security issues in dependencies
+        echo "Checking for security issues..."
+        # This is a basic check - in a real scenario you'd use tools like:
+        # - nimble audit (if available)
+        # - Custom security scanners
+        # - Dependency vulnerability databases
+
+        # Check for hardcoded secrets (basic pattern matching)
+        echo "Checking for potential hardcoded secrets..."
+        grep -r "password\|secret\|token\|key" --include="*.nim" src/ || echo "No obvious hardcoded secrets found"
+
+    - name: Check for outdated dependencies
+      run: |
+        echo "Checking nimble.nimble for dependency versions..."
+        grep "requires" nimble.nimble || echo "No external dependencies found"
+
+  performance:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: stable
+        repo-token: ${{ github.token }}
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Run performance benchmarks
+      run: |
+        echo "Running performance tests..."
+        nim c -r examples/performance/test_performance_registry.nim
+
+    - name: Check binary size
+      run: |
+        echo "Checking binary sizes..."
+        nim c --opt:size src/nimtest.nim
+        ls -lh nimtest
+
+        # Check for potential memory leaks (basic)
+        echo "Checking for memory management issues..."
+        nim c --gc:arc src/nimtest.nim || echo "ARC compilation failed"
+
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: stable
+        repo-token: ${{ github.token }}
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Install coverage tools
+      run: |
+        # Try to install coverage tools
+        nimble install https://github.com/disruptek/coverage || echo "Coverage tool not available"
+
+    - name: Run tests with coverage
+      run: |
+        echo "Running tests with coverage analysis..."
+        # Basic coverage check - in practice you'd use specialized tools
+        nim c -r examples/test_all.nim
+
+        # Generate coverage report if tools are available
+        if command -v coverage &> /dev/null; then
+          echo "Generating coverage report..."
+          coverage html || echo "Coverage report generation failed"
+        else
+          echo "Coverage tools not available, skipping detailed coverage report"
+        fi
+
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-reports
+        path: |
+          *.html
+          coverage/
+        retention-days: 30
+
+  analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Nim
+      uses: jiro4989/setup-nim-action@v2
+      with:
+        nim-version: stable
+        repo-token: ${{ github.token }}
+
+    - name: Install dependencies
+      run: nimble install -y
+
+    - name: Code analysis
+      run: |
+        echo "Analyzing code quality..."
+
+        # Check for unused imports
+        echo "Checking for potential unused imports..."
+        find src -name "*.nim" -exec grep -l "^import" {} \; | xargs -I {} sh -c 'echo "Analyzing {}"; grep "^import" {}' || true
+
+        # Check line lengths
+        echo "Checking line lengths..."
+        find src -name "*.nim" -exec awk 'length($0) > 120 {print FILENAME ":" NR ": line too long (" length($0) " chars): " $0}' {} \;
+
+        # Check for TODO/FIXME comments
+        echo "Checking for TODO/FIXME comments..."
+        grep -r "TODO\|FIXME\|XXX" src/ || echo "No TODO/FIXME comments found"
+
+    - name: Complexity analysis
+      run: |
+        echo "Analyzing code complexity..."
+        # Basic complexity check - count procedures per file
+        find src -name "*.nim" -exec sh -c 'echo -n "$1: "; grep -c "^proc \|template \|macro " "$1"' _ {} \;
