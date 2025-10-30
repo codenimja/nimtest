@@ -8,13 +8,14 @@ nimtest is a comprehensive testing framework for Nim projects, providing utiliti
 ### Modular Design
 - **`src/nimtest/helpers.nim`**: Core utilities, TestContext for resource management, file system assertions, CLI testing utilities
 - **`src/nimtest/reporting.nim`**: Test result collection, analytics, and output format generation (console, JSON, JUnit XML, Markdown)
-- **`src/nimtest/test_config.nim`**: Project-specific configuration constants and CLI command definitions
+- **`src/nimtest/test_config.nim`**: Project-specific configuration constants and CLI command definitions (NEEDS TO BE CREATED)
 
 ### Key Data Types
 - **`TestContext`**: Manages temporary files/directories with automatic cleanup
-- **`TestResult`**: Individual test outcome with metadata (name, success, duration, message)
+- **`TestSuiteResult`**: Individual test outcome with metadata (name, success, duration, message)
 - **`TestSuiteReport`**: Collection of test results with analytics
 - **`ComponentMetadata`**: UI component metadata for component-based testing
+- **`ProgressBar`**: Visual progress indicators with multiple styles (minimal, globe, pulse, dots, blocks)
 
 ## Essential Patterns & Conventions
 
@@ -42,6 +43,7 @@ suite "Feature Tests":
 - **Always use TestContext** for temporary resources - never create files/dirs manually in tests
 - **Track resources automatically** through `ctx.createTempTestDir()` and `createTestFile(ctx, ...)`
 - **Cleanup happens automatically** via `ctx.cleanup()` in teardown
+- **Use forward slashes** for paths - nimtest handles platform conversion
 
 ### CLI Testing Pattern
 ```nim
@@ -55,25 +57,59 @@ assertOutputContains(output, "1.0.0")
 assertFileExists("config.json")
 assertFileContains("output.txt", "expected content")
 assertDirExists("temp/")
+assertFileHasSize("data.bin", 1024)
+assertFileModifiedAfter("file.txt", startTime)
 ```
 
 ## Configuration & Setup
 
 ### Project Configuration (`src/nimtest/test_config.nim`)
-- **Edit this file first** when setting up for a new project
-- Configure `PROJECT_NAME`, `CLI_BINARY_PATH`, feature flags (`HAS_CLI`, `HAS_COMPONENT_SYSTEM`)
-- Define CLI command constants (`CMD_INIT`, `CMD_LIST`, etc.)
-- Set directory paths (`SRC_DIR`, `TEST_DIR`)
+⚠️ **CRITICAL**: This file does not exist yet and must be created first when setting up for a new project.
+
+**Create this file with:**
+```nim
+import helpers
+
+const
+  PROJECT_NAME* = "yourproject"          # Your project name
+  PROJECT_DISPLAY_NAME* = "YourProject"  # Display name
+  CLI_BINARY_PATH* = "./bin/yourproject" # CLI binary path (if applicable)
+  HAS_CLI* = true                       # Enable CLI testing features
+  HAS_COMPONENT_SYSTEM* = false          # Enable component testing features
+
+  # Directory paths
+  SRC_DIR* = "src"
+  TEST_DIR* = "tests"
+
+  # CLI command constants
+  CMD_INIT* = "init"
+  CMD_LIST* = "list"
+  CMD_CREATE* = "create"
+  CMD_EXPORT* = "export"
+
+  # Temporary directory prefix
+  TEMP_DIR_PREFIX* = "nimtest_"
+
+# Module categories for component testing
+type
+  ModuleCategory* = enum
+    catGeneral = "general"
+    catCore = "core"
+    catUtility = "utility"
+    catExtension = "extension"
+    catPlugin = "plugin"
+```
 
 ### Build & Run Commands
 ```bash
-# Build and run tests
-nimble test
-nim c -r examples/test_all.nim
+# Build the framework
+nim c src/nimtest.nim
 
-# Run specific test suites
-nim c -r examples/core/test_registry_init.nim
-nim c -r examples/cli/test_cli_create.nim
+# Run framework tests (when examples exist)
+nimble test
+
+# Run specific test files
+nim c -r examples/test_file.nim
 
 # Generate reports
 nim c -r examples/test_reporting_demo.nim
@@ -110,6 +146,21 @@ addResult(report, result)
 generateConsoleReport(report)
 saveReport(report, rfJson, "report.json")
 saveReport(report, rfJunitXml, "junit.xml")
+```
+
+### Progress Bars
+```nim
+# Create progress bar
+let bar = newProgressBar(pbsGlobe, width = 40, total = 100, message = "Running tests...")
+
+# Update progress during test execution
+for i in 0..<100:
+  # Test logic here
+  bar.updateProgress(i + 1, fmt"Completed {i + 1}/100 tests")
+  bar.display()
+
+# Complete progress bar
+bar.finish("All tests completed!")
 ```
 
 ## Common Workflows
@@ -172,6 +223,27 @@ test "CLI error handling":
   assertOutputContains(output, "ERROR")
 ```
 
+### Performance Testing
+```nim
+test "performance regression check":
+  let testData = createTestFile(ctx, tempDir, "large.txt", "x".repeat(1000000))
+
+  measureTime("file processing"):
+    let content = readFile(testData)
+    let processed = content.toUpperAscii()
+    writeFile(testData & ".processed", processed)
+
+  assertFileExists(testData & ".processed")
+```
+
+### Benchmarking
+```nim
+benchmark("string operations", 1000):
+  var s = ""
+  for i in 0..100:
+    s &= "test"
+```
+
 ## Framework Extension Guidelines
 
 ### Adding New Assertions
@@ -210,21 +282,6 @@ test "complete project workflow":
   assertDirExists(projectDir / "tests")
 ```
 
-## Performance Testing Integration
-
-### Benchmark Integration
-```nim
-test "performance regression check":
-  let testData = createTestFile(ctx, tempDir, "large.txt", "x".repeat(1000000))
-
-  measureTime("file processing"):
-    let content = readFile(testData)
-    let processed = content.toUpperAscii()
-    writeFile(testData & ".processed", processed)
-
-  assertFileExists(testData & ".processed")
-```
-
 ## Error Handling Patterns
 
 ### Graceful Test Failure Handling
@@ -259,3 +316,25 @@ test "handles missing files gracefully":
 - **Security scanning** with automated tools
 - **Performance regression testing** in CI pipeline
 - **Cross-platform testing** on all major operating systems
+
+## Current Project State & Gaps
+
+### Missing Critical Components
+- **`src/nimtest/test_config.nim`**: Must be created for the framework to be usable
+- **Example test files**: No actual working examples exist yet
+- **Integration tests**: Framework needs real-world usage examples
+
+### Immediate Action Items for AI Agents
+1. **Create `test_config.nim`** with proper constants and types
+2. **Generate example test files** in `examples/` directory
+3. **Create `examples/test_all.nim`** to run all examples
+4. **Add working CLI test examples** using `runCliCommand()`
+5. **Implement component testing examples** for UI frameworks
+
+### Framework Usage Pattern
+This framework is designed to be **copied into other Nim projects**, not used as a dependency. When setting up for a new project:
+
+1. Copy `src/nimtest/` directory to your project's `src/`
+2. Create and configure `test_config.nim`
+3. Write tests using the patterns above
+4. Run with `nim c -r your_test.nim`

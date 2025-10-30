@@ -8,8 +8,8 @@ This project is a work in progress and is currently in beta. While functional an
 
 ## Features
 
-- **Comprehensive Testing**: Support for unit, integration, CLI, and performance tests
-- **Resource Management**: Automatic cleanup of temporary files and directories
+- **Comprehensive Testing Utilities**: File operations, assertions, CLI testing, performance benchmarking
+- **Resource Management**: Automatic cleanup of temporary files and directories via TestContext
 - **Rich Reporting**: Console, JSON, JUnit XML, and Markdown report formats
 - **Progress Bars**: Subtle loading indicators (5 styles: minimal, globe, pulse, dots, blocks)
 - **Performance Utilities**: Built-in timing and benchmarking tools
@@ -23,7 +23,7 @@ This project is a work in progress and is currently in beta. While functional an
 
 ### 1. Installation
 
-Copy the `src/nimtest` directory to your project's source directory and configure:
+Copy the `src/nimtest` directory to your project's source directory:
 
 ```bash
 # Copy framework to your project
@@ -45,23 +45,29 @@ const
 
 ```nim
 import nimtest
-import std/unittest
+import std/[os, times]
 
-suite "My Tests":
-  var ctx: TestContext
+# Create and use test context for resource management
+var ctx = createTestContext()
+try:
+  # Create temporary resources
+  let testDir = createTempTestDir(ctx, "mytest")
+  let testFile = createTestFile(ctx, testDir, "test.txt", "Hello, World!")
+  
+  # Use assertion utilities
+  discard assertFileExists(testFile)
+  discard assertFileContains(testFile, "Hello, World!")
+  
+  # Use performance utilities
+  let duration = measureTime("Simple operation"):
+    proc() = 
+      sleep(10)  # Small delay to measure
 
-  setup:
-    ctx = createTestContext()
+  echo "Operation took: ", duration, " seconds"
 
-  teardown:
-    ctx.cleanup()
-
-  test "basic functionality":
-    let testDir = ctx.createTempTestDir()
-    let testFile = createTestFile(ctx, testDir, "test.txt", "Hello, World!")
-    
-    assertFileExists(testFile)
-    assertFileContains(testFile, "Hello, World!")
+finally:
+  # Always cleanup resources
+  ctx.cleanup()
 ```
 
 ### 4. Run Tests
@@ -79,14 +85,15 @@ nim c -r tests/my_test.nim
 The `TestContext` manages temporary resources and ensures proper cleanup:
 
 ```nim
-suite "Resource Management":
-  var ctx: TestContext
-
-  setup:
-    ctx = createTestContext()
-
-  teardown:
-    ctx.cleanup()
+# Create test context
+var ctx = createTestContext()
+try:
+  # Create temporary files and directories
+  let tempDir = createTempTestDir(ctx, "test_prefix")
+  # ... your test code
+finally:
+  # Cleanup all registered resources
+  ctx.cleanup()
 ```
 
 ### File System Utilities
@@ -94,15 +101,15 @@ suite "Resource Management":
 Comprehensive utilities for file and directory testing:
 
 ```nim
-# Basic assertions
-assertFileExists("config.json")
-assertDirExists("output/")
-assertFileContains("log.txt", "SUCCESS")
+# Basic assertions (return bool, throw exception on failure)
+discard assertFileExists("config.json")
+discard assertDirExists("output/")
+discard assertFileContains("log.txt", "SUCCESS")
 
 # Advanced assertions  
-assertFileNotExists("deleted.txt")
-assertFileHasSize("data.bin", 1024)
-assertFileModifiedAfter("file.txt", startTime)
+discard assertFileNotExists("deleted.txt")
+discard assertFileHasSize("data.bin", 1024)
+discard assertFileModifiedAfter("file.txt", getTime())
 ```
 
 ### CLI Testing
@@ -110,10 +117,10 @@ assertFileModifiedAfter("file.txt", startTime)
 Built-in utilities for testing command-line applications:
 
 ```nim
-test "CLI version command":
-  let (output, exitCode) = runCliCommand("--version")
-  check exitCode == 0
-  assertOutputContains(output, "1.0.0")
+# Test CLI commands
+let (output, exitCode) = runCliCommand("--version")
+if exitCode == 0:
+  discard assertOutputContains(output, "1.0.0")
 ```
 
 ### Performance Testing
@@ -122,14 +129,18 @@ Timing and benchmarking utilities:
 
 ```nim
 # Measure single operation
-measureTime("database query"):
-  database.executeQuery("SELECT * FROM users")
+let duration = measureTime("database query"):
+  proc() = 
+    # database.executeQuery("SELECT * FROM users")
 
 # Benchmark multiple iterations
-benchmark("string operations", 1000):
-  var s = ""
-  for i in 0..100:
-    s &= "test"
+let benchResults = benchmark("string operations", 1000):
+  proc() = 
+    var s = ""
+    for i in 0..100:
+      s &= "test"
+
+echo "Average: ", benchResults.avg, "s, Min: ", benchResults.min, "s, Max: ", benchResults.max, "s"
 ```
 
 ### Reporting
@@ -137,38 +148,58 @@ benchmark("string operations", 1000):
 Comprehensive test reporting with multiple output formats:
 
 ```nim
+# Create test report
 var report = newTestSuiteReport("My Test Suite")
 
 # Add test results
 let result = newTestResult("my test", true, 0.005, "Test passed")
 addResult(report, result)
 
-# Generate reports
+# Generate different report formats
 generateConsoleReport(report)
 let jsonFile = saveReport(report, rfJson, "report.json")
+let junitFile = saveReport(report, rfJunit, "report.xml")
+let markdownFile = saveReport(report, rfMarkdown, "report.md")
 ```
 
 ### Progress Bars
 
-Visual feedback for long-running test suites with 5 different styles:
+Visual feedback for long-running operations with 5 different styles:
 
 ```nim
 # Create progress bar
-let bar = newProgressBar(pbsGlobe, width = 40, total = 100, message = "Running tests...")
+let bar = newProgressBar(pbsGlobe, width = 40, total = 100, message = "Running...")
 
-# Update progress during test execution
+# Update progress during execution
 for i in 0..<100:
-  # Test logic here
-  bar.updateProgress(i + 1, fmt"Completed {i + 1}/100 tests")
+  # Your operation here
+  sleep(10)  # Simulate work
+  bar.updateProgress(i + 1, &"Processing {i + 1}/100")
   bar.display()
 
 # Complete progress bar
-bar.finish("All tests completed!")
-
-# Or use the built-in progress runner
-let testSuites = @[("Unit Tests", runUnitTests), ("Integration", runIntegrationTests)]
-let report = runTestsWithProgress(testSuites, pbsBlocks)
+bar.finish("All tasks completed!")
 ```
+
+## API Overview
+
+### Helpers Module
+- `createTestContext()` - Create a new test context for resource management
+- `cleanup(ctx)` - Clean up all registered resources
+- `tryCleanup(ctx)` - Attempt cleanup and return success status with errors
+- File operations: `createTestFile()`, `createTestDir()`, `createTempTestDir()`
+- Assertions: `assertFileExists()`, `assertFileContains()`, `assertDirExists()`, etc.
+- CLI utilities: `runCliCommand()`, `runCliCommandInDir()`
+- Performance: `measureTime()`, `benchmark()`, `runTestWithTimeout()`
+- Advanced: `assertThrows()`, `createTestComponent()`, `createTestMetadata()`
+
+### Reporting Module
+- `newTestSuiteReport(name)` - Create a new test suite report
+- `newTestResult()` - Create individual test result
+- Report formats: `generateConsoleReport()`, `generateJsonReport()`, `generateJunitReport()`, `generateMarkdownReport()`
+- `saveReport()` - Save reports to files in different formats
+- `runTestsWithProgress()` - Run tests with visual progress feedback
+- `getStatistics()`, `getFailedResults()`, `sortResults()` - Report analysis functions
 
 ## Documentation
 
@@ -196,53 +227,58 @@ tests/                      # Framework tests
 
 ## Examples
 
-### Basic Unit Test
+### Basic File Operation Test
 
 ```nim
 import nimtest
-import std/unittest
+import std/[os, times]
 
-suite "Calculator Tests":
-  test "addition works":
-    check add(2, 3) == 5
-    check add(-1, 1) == 0
+# Create test context for resource management
+var ctx = createTestContext()
+try:
+  # Create temporary directory and file
+  let testDir = createTempTestDir(ctx, "file_test")
+  let testFile = createTestFile(ctx, testDir, "config.json", """{"debug": true}""")
+  
+  # Validate file operations
+  discard assertFileExists(testFile)
+  discard assertFileContains(testFile, "debug")
+  discard assertFileContains(testFile, "true")
+  
+  echo "File operations test passed!"
+  
+finally:
+  ctx.cleanup()
 ```
 
-### File System Test
+### CLI Testing Example
 
 ```nim
 import nimtest
-import std/unittest
 
-suite "File Operations":
-  var ctx: TestContext
-
-  setup:
-    ctx = createTestContext()
-
-  teardown:
-    ctx.cleanup()
-
-  test "file creation and validation":
-    let dir = ctx.createTempTestDir()
-    let file = createTestFile(ctx, dir, "config.json", """{"debug": true}""")
-    
-    assertFileExists(file)
-    assertFileContains(file, "debug")
-    assertFileContains(file, "true")
+# Test a CLI command
+let (output, exitCode) = runCliCommand("--help")
+if exitCode == 0:
+  if assertOutputContains(output, "Usage:"):
+    echo "CLI help test passed!"
 ```
 
-### CLI Test
+### Performance Benchmarking
 
 ```nim
 import nimtest
-import std/unittest
 
-suite "CLI Tests":
-  test "help command works":
-    let (output, exitCode) = runCliCommand("--help")
-    check exitCode == 0
-    assertOutputContains(output, "Usage:")
+# Benchmark string concatenation
+let results = benchmark("string operations", 10000):
+  proc() = 
+    var s = ""
+    for i in 0..100:
+      s &= "test"
+
+echo "String operations benchmark completed"
+echo "Average time: ", results.avg, " seconds"
+echo "Min time: ", results.min, " seconds" 
+echo "Max time: ", results.max, " seconds"
 ```
 
 ## License
