@@ -2,51 +2,139 @@
 
 Complete API documentation for the nimtest framework.
 
-## Table of Contents
-
-- [Getting Started](#getting-started)
-- [TestContext](#testcontext)
-- [File System Assertions](#file-system-assertions)
-- [Performance Utilities](#performance-utilities)
-- [Progress Bars](#progress-bars)
-- [Advanced Testing Utilities](#advanced-testing-utilities)
-- [Reporting Utilities](#reporting-utilities)
-- [Configuration](#configuration)
-
-## Getting Started
-
-### Installation
-
-Install via Nimble:
-```bash
-nimble install nimtest
-```
-
-### Basic Usage
-
-Import the API module:
 ```nim
 import nimtest/api
-
-# All framework functionality is now available
-var ctx = createTestContext()
-# ... use the framework
 ```
 
-## TestContext
+## Core
 
-The `TestContext` type manages test resources and ensures proper cleanup.
+- `createTestContext()` → TestContext
+- `cleanup(ctx)`
+- `tryCleanup(ctx): tuple[success: bool, errors: seq[string]]`
+- `createTempTestDir(ctx, prefix): string`
+- `createTestFile(ctx, dir, name, content): string`
 
-### Type Definition
+## Assertions
+
+- `assertFileExists(path, msg = ""): bool`
+- `assertDirExists(path, msg = ""): bool`
+- `assertFileContains(path, content, msg = ""): bool`
+- `assertFileContainsFast(path, content, msg = ""): bool`
+- `assertFileNotExists(path, msg = ""): bool`
+- `assertDirNotExists(path, msg = ""): bool`
+- `assertFileDoesNotContain(path, content, msg = ""): bool`
+- `assertFileHasSize(path, expectedSize, msg = ""): bool`
+- `assertFileModifiedAfter(path, time, msg = ""): bool`
+- `assertThrows(proc, ExceptionType, msg = ""): bool`
+- `assertOutputDoesNotContain(output, unexpected, msg = ""): bool`
+
+## Performance
+
+- `measureTime(label, body): float`
+- `benchmark(label, iterations, body): tuple[avg, min, max, total]`
+
+## Progress Bars
+
+- `newProgressBar(style, width = 40, total = 100, message = ""): ProgressBar`
+- `update(bar, current, msg = "")`
+- `render(bar): string`
+- `display(bar)`
+- `finish(bar, message = "Complete!")`
+
+### Progress Bar Styles
+
+- `pbsMinimal` - Simple bar with percentage
+- `pbsGlobe` - Globe-like rotating progress
+- `pbsPulse` - Pulsing bar with subtle animation
+- `pbsDots` - Animated dots
+- `pbsBlocks` - Unicode block characters
+
+## Reporting
+
+- `newTestSuiteReport(name): TestSuiteReport`
+- `newTestResult(name, passed, duration, message = "", category = "general"): TestSuiteResult`
+- `addResult(report, result)`
+- `finish(report)`
+- `generateConsoleReport(report)`
+- `generateJsonReport(report): string`
+- `generateJunitReport(report): string`
+- `generateMarkdownReport(report): string`
+- `saveReport(report, format, filename = ""): string`
+- `trySaveReport(report, format, filename = ""): tuple[success, filename, error]`
+- `printSummary(report)`
+
+### Report Formats
+
+- `rfConsole` - Human-readable console output
+- `rfJson` - JSON format
+- `rfJunit` - JUnit XML format
+- `rfMarkdown` - Markdown format
+
+## Configuration
+
+- `ProjectName: string`
+- `ProjectDisplayName: string`
+- `TempDirPrefix: string`
+- `TestSuiteVersion: string`
+
+## Types
+
+### TestContext
 
 ```nim
-type
-  TestContext* = ref object
-    tempDirs*: seq[string]
-    tempFiles*: seq[string]
-    startTime*: Time
-    isCleanedUp*: bool
+type TestContext* = ref object
+  tempDirs*: seq[string]
+  tempFiles*: seq[string]
+  startTime*: Time
+  isCleanedUp*: bool
 ```
+
+### TestSuiteResult
+
+```nim
+type TestSuiteResult* = ref object
+  name*: string
+  passed*: bool
+  duration*: float
+  message*: string
+  timestamp*: Time
+  category*: string
+  tags*: seq[string]
+```
+
+### TestSuiteReport
+
+```nim
+type TestSuiteReport* = ref object
+  name*: string
+  startTime*: Time
+  endTime*: Time
+  results*: seq[TestSuiteResult]
+  config*: Table[string, string]
+```
+
+### ProgressBar
+
+```nim
+type ProgressBar* = ref object
+  style*: ProgressBarStyle
+  width*: int
+  current*: int
+  total*: int
+  startTime*: Time
+  lastUpdate*: Time
+  message*: string
+  showPercentage*: bool
+  showTime*: bool
+  maxValue*: int
+```
+
+## CLI Testing (Future)
+
+CLI testing utilities are planned for future releases:
+
+- `runCliCommand(args): tuple[output, exitCode]`
+- `assertOutputContains(output, expected, msg = ""): bool`
 
 ### Procedures
 

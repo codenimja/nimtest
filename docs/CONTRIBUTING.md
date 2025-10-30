@@ -1,30 +1,37 @@
 # Contributing to nimtest
 
-Thank you for your interest in contributing to nimtest! This document provides guidelines and information for contributors.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Nim](https://img.shields.io/badge/Nim-1.6+-blue.svg)](https://nim-lang.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/yourusername/nimtest/pulls)
 
-## Table of Contents
+Guidelines and information for contributors to the nimtest testing framework.
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Setup](#development-setup)
-- [Project Structure](#project-structure)
-- [Development Workflow](#development-workflow)
-- [Testing Guidelines](#testing-guidelines)
-- [Code Style](#code-style)
-- [Documentation](#documentation)
-- [Submitting Changes](#submitting-changes)
-- [Review Process](#review-process)
-- [Community](#community)
+## Install
 
-## Code of Conduct
+```bash
+git clone https://github.com/yourusername/nimtest.git
+cd nimtest
+nimble install
+```
 
-This project follows a code of conduct to ensure a welcoming environment for all contributors. By participating, you agree to:
+## Quick Example
 
-- Be respectful and inclusive
-- Focus on constructive feedback
-- Accept responsibility for mistakes
-- Show empathy towards other contributors
-- Help create a positive community
+```nim
+# Clone and setup
+git clone https://github.com/yourusername/nimtest.git
+cd nimtest
+
+# Create a feature branch
+git checkout -b feature/new-assertion
+
+# Make changes and test
+nim c -r examples/test_all.nim
+
+# Commit and push
+git add .
+git commit -m "feat: add new assertion function"
+git push origin feature/new-assertion
+```
 
 ## Getting Started
 
@@ -34,7 +41,7 @@ This project follows a code of conduct to ensure a welcoming environment for all
 - **Git**: For version control
 - **Terminal**: Bash or compatible shell
 
-### Quick Setup
+### Development Setup
 
 ```bash
 # Clone the repository
@@ -52,53 +59,24 @@ nim c src/nimtest.nim
 nim c -r examples/test_all.nim
 ```
 
-## Development Setup
-
-### IDE Configuration
-
-#### VS Code (Recommended)
-1. Install the Nim extension
-2. Use the provided `.vscode/tasks.json` for common operations
-3. Configure snippets from `.vscode/nimtest.code-snippets`
-
-#### Other Editors
-- Vim/Neovim: Use nim.nvim or syntax highlighting
-- Emacs: Use nim-mode
-- Any editor with Nim syntax support
-
-### Environment Setup
-
-```bash
-# Create a development environment file (optional)
-cat > .env << EOF
-# Development configuration
-NIMTEST_DEBUG=true
-NIMTEST_LOG_LEVEL=debug
-EOF
-```
-
 ## Project Structure
 
 ```
 nimtest/
 ├── src/nimtest/           # Core framework source
-│   ├── helpers.nim       # Core utilities and TestContext
+│   ├── api.nim           # Public API facade
+│   ├── core.nim          # TestContext and basic utilities
+│   ├── helpers.nim       # Advanced assertions and utilities
 │   ├── reporting.nim     # Test reporting and analytics
-│   └── test_config.nim   # Configuration and constants
+│   ├── progress.nim      # Progress bar implementations
+│   └── config.nim        # Configuration constants
 ├── examples/             # Example test implementations
-│   ├── core/            # Core functionality examples
-│   ├── cli/             # CLI testing examples
-│   ├── performance/     # Performance testing examples
-│   └── integration/     # Integration test examples
+│   ├── basic_test.nim    # Basic usage examples
+│   ├── comprehensive_example.nim
+│   └── test_basic.nim
 ├── docs/                # Documentation
-│   ├── API.md          # API reference
-│   ├── ARCHITECTURE.md # Architecture documentation
-│   └── USER_GUIDE.md   # User guide
 ├── tests/               # Framework tests
-├── utils/               # Development utilities
 └── .github/            # GitHub configuration
-    ├── workflows/      # CI/CD pipelines
-    └── ISSUE_TEMPLATE/ # Issue templates
 ```
 
 ## Development Workflow
@@ -128,11 +106,8 @@ git checkout -b fix/issue-number-description
 nim c -r examples/test_all.nim
 
 # Run specific test suites
-nim c -r examples/core/test_registry_init.nim
-nim c -r examples/cli/test_cli_create.nim
-
-# Run performance tests
-nim c -r examples/performance/test_performance_registry.nim
+nim c -r examples/basic_test.nim
+nim c -r examples/comprehensive_example.nim
 ```
 
 ### 5. Commit Your Changes
@@ -144,7 +119,7 @@ git add .
 git commit -m "feat: add new assertion function assertFileHasLineCount
 
 - Add assertFileHasLineCount procedure to helpers.nim
-- Include comprehensive tests in examples/core/
+- Include comprehensive tests in examples/
 - Update API documentation
 - Add usage examples in docs/EXAMPLES.md"
 ```
@@ -168,8 +143,7 @@ git push origin feature/your-feature-name
 
 ### Test Structure Pattern
 ```nim
-import nimtest
-import std/unittest
+import nimtest/api
 
 suite "Feature Tests":
   var ctx: TestContext
@@ -189,8 +163,8 @@ suite "Feature Tests":
     # ... perform operations
 
     # Assert
-    assertFileExists(tempFile)
-    assertFileContains(tempFile, "content")
+    discard assertFileExists(tempFile)
+    discard assertFileContains(tempFile, "content")
 ```
 
 ### Test Coverage
@@ -209,7 +183,7 @@ test "performance benchmark":
     let processed = content.toUpperAscii()
     writeFile(testData & ".processed", processed)
 
-  assertFileExists(testData & ".processed")
+  discard assertFileExists(testData & ".processed")
 ```
 
 ## Code Style
@@ -371,9 +345,9 @@ Contributors are recognized through:
 
 ## Additional Resources
 
-- [User Guide](docs/USER_GUIDE.md) - Complete usage instructions
-- [API Reference](docs/API.md) - Detailed API documentation
-- [Architecture](docs/ARCHITECTURE.md) - Framework design principles
-- [Best Practices](docs/BEST_PRACTICES.md) - Recommended patterns
+- [User Guide](USER_GUIDE.md) - Complete usage instructions
+- [API Reference](API.md) - Detailed API documentation
+- [Architecture](ARCHITECTURE.md) - Framework design principles
+- [Best Practices](BEST_PRACTICES.md) - Recommended patterns
 
 Thank you for contributing to nimtest! Your contributions help make testing in Nim better for everyone.

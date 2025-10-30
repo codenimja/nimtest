@@ -1,4 +1,30 @@
-# Security Policy
+# nimtest Security Policy
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Nim](https://img.shields.io/badge/Nim-1.6+-blue.svg)](https://nim-lang.org/)
+
+Security policy and guidelines for the nimtest testing framework.
+
+## Install
+
+```bash
+nimble install nimtest
+```
+
+## Quick Example
+
+```nim
+import nimtest/api
+
+# Secure test with proper resource cleanup
+var ctx = createTestContext()
+try:
+  let tempDir = ctx.createTempTestDir("secure_test")
+  let tempFile = createTestFile(ctx, tempDir, "sensitive.txt", "data")
+  # Test operations...
+finally:
+  ctx.cleanup()  # Ensures no sensitive data remains
+```
 
 ## Supported Versions
 

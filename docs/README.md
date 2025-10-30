@@ -1,53 +1,165 @@
-# nimtest Framework
+# nimtest — The Only Testing Framework You'll Ever Need
 
-A comprehensive, modular testing framework for Nim projects.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/codenimja/nimtest/ci.yml?branch=main&style=flat-square)](https://github.com/codenimja/nimtest/actions)
+[![nimble](https://img.shields.io/badge/nimble-v0.1.0-blue.svg?style=flat-square)](https://github.com/codenimja/nimtest)
 
-## Overview
+nimtest is a comprehensive testing package for Nim projects, providing utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and rich reporting.
 
-nimtest is a professional testing framework that provides utilities for unit tests, integration tests, and performance benchmarks with automatic resource management and comprehensive reporting:
-- Resource management (with `TestContext` for automatic cleanup)
-- File system assertions (file and directory validation utilities)
-- Performance testing (timing and benchmarking utilities)
-- Progress visualization (5 different progress bar styles)
-- Comprehensive reporting (console, JSON, JUnit, Markdown formats)
+## Install
 
-## Framework Structure
+```bash
+nimble install nimtest
+```
 
-The nimtest framework consists of:
+## Quick Example
+
+```nim
+import nimtest/api   # ← ONE IMPORT TO RULE THEM ALL
+
+var ctx = createTestContext()
+try:
+  let dir = createTempTestDir(ctx, "demo")
+  let f = createTestFile(ctx, dir, "hello.txt", "world")
+  discard assertFileContains(f, "world")
+finally:
+  ctx.cleanup()
+```
+
+## Features
+
+- Auto-cleanup via TestContext
+- 4 report formats (including JUnit XML)
+- 5 animated progress bars
+- Full CLI testing
+- Benchmarks with benchmark()
+- nimble test ready
+
+## Documentation
+
+This documentation covers all aspects of the nimtest framework:
+
+### Getting Started
+- [Quick Start Guide](QUICKSTART.md) - Get up and running in 5 minutes
+- [Configuration Guide](CONFIGURATION.md) - Complete setup and configuration
+- [User Guide](USER_GUIDE.md) - Complete usage instructions
+
+### Core Documentation
+- [API Reference](API.md) - Complete API documentation
+- [Architecture](ARCHITECTURE.md) - Framework design and architecture
+- [Best Practices](BEST_PRACTICES.md) - Recommended patterns and practices
+
+### Examples and Guides
+- [Examples and Patterns](EXAMPLES.md) - Common testing scenarios
+
+### Community
+- [Contribution Guidelines](CONTRIBUTING.md) - How to contribute to the project
+- [CI/CD Guide](CI_CD_GUIDE.md) - Integration with CI/CD systems
+
+## Core Concepts
+
+### Public API
+
+The recommended way to import nimtest is:
+
+```nim
+import nimtest/api
+```
+
+This provides access to all core functionality in a clean namespace.
+
+### Test Context
+
+The `TestContext` manages temporary resources and ensures proper cleanup:
+
+```nim
+# Create test context
+var ctx = createTestContext()
+try:
+  # Create temporary files and directories
+  let tempDir = createTempTestDir(ctx, "test_prefix")
+  # ... your test code
+finally:
+  # Cleanup all registered resources
+  ctx.cleanup()
+```
+
+### File System Utilities
+
+Comprehensive utilities for file and directory testing:
+
+```nim
+# Basic assertions (return bool, throw exception on failure)
+discard assertFileExists("path/to/file")
+discard assertFileContains("path/to/file", "expected content")
+discard assertDirExists("path/to/directory")
+```
+
+### Performance Testing
+
+Built-in benchmarking and timing utilities:
+
+```nim
+# Time a code block
+let duration = measureTime("operation"):
+  proc() =
+    # Your code here
+    sleep(100)
+
+# Run benchmarks
+let results = benchmark("test operation", 1000):
+  proc() =
+    # Code to benchmark
+    discard 1 + 1
+```
+
+### Progress Visualization
+
+Five different animated progress bar styles:
+
+```nim
+let bar = newProgressBar(pbsGlobe, total = 100, message = "Processing...")
+for i in 0..99:
+  # Do work
+  bar.update(i + 1)
+bar.finish("Complete!")
+```
+
+### Reporting
+
+Multiple output formats for different use cases:
+
+```nim
+var report = newTestSuiteReport("My Tests")
+# ... add test results
+generateConsoleReport(report)  # Human-readable output
+saveReport(report, rfJunit, "junit.xml")  # CI/CD integration
+saveReport(report, rfJson, "report.json")  # Programmatic access
+```
+
+## Framework Architecture
+
+nimtest is organized into focused modules:
 
 ```
 src/nimtest/
-├── helpers.nim        # Core utilities, assertions, resource management
-├── reporting.nim      # Test reporting, analytics, and output formats
-└── test_config.nim    # Project configuration and constants
+├── api.nim          # Public API facade - import this
+├── core.nim         # TestContext, basic utilities
+├── helpers.nim      # Advanced assertions, CLI testing
+├── reporting.nim    # Test results, multiple output formats
+├── progress.nim     # Progress bar implementations
+├── config.nim       # Project configuration constants
+└── nimtest.nim      # Legacy import (deprecated)
 ```
 
-## Installation
+## Contributing
 
-To use nimtest in your project:
+We welcome contributions! See our [Contribution Guidelines](CONTRIBUTING.md) for details on how to get involved.
 
-1. Copy the `src/nimtest` directory to your project's source directory
-2. Edit `src/nimtest/test_config.nim` to configure for your project
-3. Import the framework in your test files
+## License
 
-## Basic Usage
-
-### Writing Your First Test
-
-```nim
-import nimtest
-import std/unittest
-
-suite "Basic Tests":
-  var ctx: TestContext
-
-  setup:
-    ctx = createTestContext()
-
-  teardown:
-    ctx.cleanup()
-
-  test "basic example":
+MIT License - see [LICENSE](../LICENSE) for details.
     # Use nimtest utilities in your tests
     let testDir = ctx.createTempTestDir("basic_test")
     let testFile = testDir / "sample.txt"

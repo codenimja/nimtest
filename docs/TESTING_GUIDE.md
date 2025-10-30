@@ -1,6 +1,31 @@
 # nimtest Testing Guide
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Nim](https://img.shields.io/badge/Nim-1.6+-blue.svg)](https://nim-lang.org/)
+
 Complete guide to using the nimtest framework for testing your Nim projects.
+
+## Install
+
+```bash
+nimble install nimtest
+```
+
+## Quick Example
+
+```nim
+import nimtest/api
+
+suite "Basic Tests":
+  var ctx = createTestContext()
+  try:
+    let tempDir = ctx.createTempTestDir("demo")
+    let tempFile = createTestFile(ctx, tempDir, "test.txt", "content")
+    discard assertFileExists(tempFile)
+    discard assertFileContains(tempFile, "content")
+  finally:
+    ctx.cleanup()
+```
 
 ## Overview
 
@@ -11,7 +36,7 @@ nimtest is a comprehensive testing framework that provides utilities for unit te
 ### Basic Test Structure
 
 ```nim
-import nimtest
+import nimtest/api
 import std/unittest
 
 suite "Your Test Suite":
@@ -46,7 +71,7 @@ suite "Resource Management Tests":
     let testDir = ctx.createTempTestDir("file_test")
     let testFile = testDir / "sample.txt"
     writeFile(testFile, "Hello, World!")
-    
+
     # Verify with nimtest assertions
     assertFileExists(testFile)
     assertFileContains(testFile, "Hello, World!")

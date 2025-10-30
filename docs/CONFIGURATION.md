@@ -2,52 +2,280 @@
 
 Complete guide to configuring and setting up the nimtest framework for your project.
 
-## Table of Contents
+## Installation
 
-- [Project Setup](#project-setup)
-- [Configuration File](#configuration-file)
-- [Feature Configuration](#feature-configuration)
-- [Directory Structure](#directory-structure)
-- [CLI Integration](#cli-integration)
-- [Testing Environment](#testing-environment)
-- [Customization Options](#customization-options)
-- [Platform-Specific Setup](#platform-specific-setup)
+nimtest is distributed as a Nimble package, making setup simple:
 
-## Project Setup
+```bash
+nimble install nimtest
+```
 
-### Initial Installation
+That's it! No additional configuration required.
 
-To integrate nimtest into your project:
+## Project Structure
 
-1. Copy the `src/nimtest` directory to your project's source directory
-2. Ensure your project structure includes a `tests/` directory
-3. Edit the configuration file to match your project
-4. Create your first test file
-
-### Basic Project Structure
+nimtest works with your existing project structure:
 
 ```
 your-project/
 ├── src/
 │   └── yourproject.nim
-├── nimble.nimble          # Install via: nimble install nimtest
 ├── tests/                 # Your test files
-│   ├── unit/
-│   ├── integration/
-│   └── performance/
+│   ├── test_basic.nim
+│   ├── test_advanced.nim
+│   └── test_performance.nim
+├── nimble.nimble
 └── README.md
 ```
 
-The nimtest framework is now installed via Nimble and automatically available. No need to copy source files.
+## Basic Usage
 
-### Setting Up Test Dependencies
+### Import the Framework
 
-Install nimtest via Nimble:
+```nim
+import nimtest/api
+import std/unittest
+
+suite "My Tests":
+  var ctx: TestContext
+
+  setup:
+    ctx = createTestContext()
+
+  teardown:
+    ctx.cleanup()
+
+  test "basic functionality":
+    let tempDir = createTempTestDir(ctx, "test")
+    let tempFile = createTestFile(ctx, tempDir, "test.txt", "content")
+    discard assertFileExists(tempFile)
+```
+
+### Running Tests
+
+Run all tests with nimble:
 
 ```bash
-nimble install nimtest
-# or add to your project's nimble file
+nimble test
 ```
+
+Run individual test files:
+
+```bash
+nim c -r tests/test_basic.nim
+```
+
+## Configuration Options
+
+nimtest has minimal configuration - it works out of the box. However, you can customize some behavior:
+
+### Temporary Directory Prefix
+
+By default, nimtest uses `"nimtest_temp"` as the prefix for temporary directories. This can be customized if needed.
+
+### Report Formats
+
+nimtest supports multiple report formats:
+- Console (human-readable)
+- JSON (machine-readable)
+- JUnit XML (CI/CD integration)
+- Markdown (documentation)
+
+### Progress Bar Styles
+
+Choose from 5 different progress bar styles:
+- `pbsMinimal` - Simple bar with percentage
+- `pbsGlobe` - Globe-like rotating progress
+- `pbsPulse` - Pulsing bar with animation
+- `pbsDots` - Animated dots
+- `pbsBlocks` - Unicode block characters
+
+## CI/CD Integration
+
+### GitHub Actions
+
+```yaml
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nim
+        uses: jiro4989/setup-nim-action@v1
+      - run: nimble install -y
+      - run: nimble test
+```
+
+### Jenkins/GitLab CI
+
+```yaml
+test:
+  script:
+    - nimble install -y
+    - nimble test
+  artifacts:
+    reports:
+      junit: test_results.xml
+```
+
+### Generating CI Reports
+
+```nim
+# In your test file
+test "generate CI reports":
+  var report = newTestSuiteReport("CI Tests")
+  # ... add test results ...
+  finish(report)
+
+  # Generate JUnit XML for CI systems
+  let junitFile = saveReport(report, rfJunit, "test_results.xml")
+```
+
+## Platform-Specific Setup
+
+nimtest works on Linux, macOS, and Windows without platform-specific configuration.
+
+### Linux/macOS
+
+No additional setup required.
+
+### Windows
+
+nimtest handles path separators automatically. Ensure your Nim installation is properly configured.
+
+## Advanced Configuration
+
+### Custom Test Runners
+
+Create custom test runners for specific needs:
+
+```nim
+# custom_runner.nim
+import nimtest/api
+import std/unittest
+
+# Custom setup
+proc setupTestEnvironment() =
+  # Your custom setup code
+  discard
+
+# Custom teardown
+proc teardownTestEnvironment() =
+  # Your custom cleanup code
+  discard
+
+# Run tests with custom environment
+setupTestEnvironment()
+try:
+  # Your test suites here
+  suite "Custom Tests":
+    test "example":
+      check true
+finally:
+  teardownTestEnvironment()
+```
+
+### Integration with Build Systems
+
+nimtest integrates seamlessly with Nim's build system:
+
+```nim
+# In your nimble.nimble
+task test, "Run all tests":
+  exec "nim c -r tests/test_basic.nim"
+  exec "nim c -r tests/test_advanced.nim"
+  exec "nim c -r tests/test_performance.nim"
+
+task testWithCoverage, "Run tests with coverage":
+  exec "nim c --coverage -r tests/test_basic.nim"
+  # Process coverage data...
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**Import errors:**
+- Ensure nimtest is installed: `nimble install nimtest`
+- Check that you're importing `nimtest/api`
+
+**Test cleanup issues:**
+- Always call `ctx.cleanup()` in teardown blocks
+- Ensure all temporary resources are created through TestContext
+
+**Performance test inconsistencies:**
+- Use higher iteration counts for stable results
+- Run benchmarks multiple times
+
+**CI/CD report issues:**
+- Verify file paths for report output
+- Check that the CI environment has write permissions
+
+## Migration from Other Frameworks
+
+### From Nim's unittest
+
+nimtest is designed to work alongside Nim's standard unittest:
+
+```nim
+# You can use both together
+import nimtest/api
+import unittest
+
+suite "Mixed Tests":
+  var ctx: TestContext
+
+  setup:
+    ctx = createTestContext()
+
+  teardown:
+    ctx.cleanup()
+
+  test "standard unittest test":
+    check(1 + 1 == 2)
+
+  test "nimtest enhanced test":
+    let tempFile = createTestFile(ctx, createTempTestDir(ctx, "test"), "test.txt", "content")
+    discard assertFileContains(tempFile, "content")
+```
+
+### From Other Testing Frameworks
+
+nimtest provides similar functionality to other testing frameworks but with Nim-specific optimizations:
+
+- Resource management replaces manual cleanup
+- File system assertions replace custom file checking code
+- Built-in benchmarking replaces external profiling tools
+- Multiple report formats support various CI/CD systems
+
+## Best Practices
+
+### Project Organization
+
+- Keep tests in a dedicated `tests/` directory
+- Group related tests in suites
+- Use descriptive test names
+- Separate unit, integration, and performance tests
+
+### Resource Management
+
+- Always use TestContext for temporary resources
+- Create resources in setup, clean up in teardown
+- Use descriptive prefixes for temporary directories
+
+### Performance Testing
+
+- Use `benchmark()` for operations that need measurement
+- Set appropriate iteration counts (100-10000 typically)
+- Compare results against known baselines
+
+### CI/CD Integration
+
+- Generate JUnit XML reports for CI systems
+- Use JSON reports for programmatic analysis
+- Archive test artifacts for debugging failed builds
 
 Add nimtest to your project's nimble file:
 

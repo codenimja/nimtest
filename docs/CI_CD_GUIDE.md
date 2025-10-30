@@ -1,6 +1,32 @@
-# CI/CD Integration Guide
+# nimtest CI/CD Integration
 
-This document explains how to integrate nimtest with popular CI/CD platforms for automated testing, following modern Nim ecosystem best practices.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Nim](https://img.shields.io/badge/Nim-1.6+-blue.svg)](https://nim-lang.org/)
+
+Complete guide for integrating nimtest with CI/CD platforms for automated testing.
+
+## Install
+
+```bash
+nimble install nimtest
+```
+
+## Quick Example
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: jiro4989/setup-nim-action@v2
+    - run: nimble install
+    - run: nim c -r examples/test_all.nim
+```
 
 ## GitHub Actions
 

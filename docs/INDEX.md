@@ -1,6 +1,29 @@
-# nimtest Documentation
+# nimtest Documentation Index
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Nim](https://img.shields.io/badge/Nim-1.6+-blue.svg)](https://nim-lang.org/)
 
 Comprehensive documentation for the nimtest testing framework.
+
+## Install
+
+```bash
+nimble install nimtest
+```
+
+## Quick Example
+
+```nim
+import nimtest/api
+
+var ctx = createTestContext()
+try:
+  let tempDir = ctx.createTempTestDir("demo")
+  let tempFile = createTestFile(ctx, tempDir, "test.txt", "content")
+  discard assertFileExists(tempFile)
+finally:
+  ctx.cleanup()
+```
 
 ## Overview
 

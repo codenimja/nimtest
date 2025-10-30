@@ -1,18 +1,30 @@
-# Architecture Documentation
+# nimtest Architecture
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Nim](https://img.shields.io/badge/Nim-1.6+-blue.svg)](https://nim-lang.org/)
 
 Detailed overview of the nimtest framework architecture, design principles, and internal structure.
 
-## Table of Contents
+## Install
 
-- [Overview](#overview)
-- [Design Principles](#design-principles)
-- [Module Architecture](#module-architecture)
-- [Core Components](#core-components)
-- [Data Flow](#data-flow)
-- [Testing Patterns](#testing-patterns)
-- [Extensibility](#extensibility)
-- [Performance Considerations](#performance-considerations)
-- [Security Aspects](#security-aspects)
+```bash
+nimble install nimtest
+```
+
+## Quick Example
+
+```nim
+import nimtest/api
+
+# Create test context for automatic resource management
+var ctx = createTestContext()
+try:
+  let tempDir = ctx.createTempTestDir("demo")
+  let tempFile = createTestFile(ctx, tempDir, "test.txt", "content")
+  discard assertFileExists(tempFile)
+finally:
+  ctx.cleanup()
+```
 
 ## Overview
 

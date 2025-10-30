@@ -1,10 +1,29 @@
-# nimtest Framework - Quick Reference
+# nimtest Quick Reference
 
-## Installation
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Nim](https://img.shields.io/badge/Nim-1.6+-blue.svg)](https://nim-lang.org/)
 
-Install via Nimble:
+Quick reference guide for the nimtest testing framework.
+
+## Install
+
 ```bash
 nimble install nimtest
+```
+
+## Quick Example
+
+```nim
+import nimtest/api
+
+suite "Quick Test":
+  var ctx = createTestContext()
+  try:
+    let tempDir = ctx.createTempTestDir("demo")
+    let tempFile = createTestFile(ctx, tempDir, "test.txt", "content")
+    discard assertFileExists(tempFile)
+  finally:
+    ctx.cleanup()
 ```
 
 ## Framework Usage

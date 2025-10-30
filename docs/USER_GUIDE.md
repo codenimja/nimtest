@@ -2,52 +2,295 @@
 
 Complete guide to using the nimtest testing framework effectively.
 
-## Table of Contents
+## Install
 
-- [Overview](#overview)
-- [Installation](#installation)
-- [Basic Usage](#basic-usage)
-- [Writing Tests](#writing-tests)
-- [Test Context Management](#test-context-management)
-- [File System Operations](#file-system-operations)
-- [CLI Testing](#cli-testing)
-- [Performance Testing](#performance-testing)
-- [Progress Bars](#progress-bars)
-- [Component Testing](#component-testing)
-- [Advanced Testing Techniques](#advanced-testing-techniques)
-- [Reporting](#reporting)
-
-## Overview
-
-nimtest is a comprehensive testing framework designed for Nim projects that provides utilities for various types of testing including unit tests, integration tests, CLI command testing, and performance benchmarks. The framework emphasizes resource management, clean test isolation, and comprehensive reporting.
-
-### Key Features
-
-- **Resource Management**: Automatic cleanup of temporary files and directories
-- **File System Assertions**: Comprehensive file and directory testing utilities
-- **CLI Testing**: Built-in utilities for testing command-line applications
-- **Performance Testing**: Timing and benchmarking utilities
-- **Component Testing**: Support for testing component-based systems
-- **Comprehensive Reporting**: Multiple report formats including console, JSON, JUnit, and Markdown
-- **Cross-Platform**: Works on Linux, macOS, and Windows
-
-## Installation
-
-To use nimtest in your project:
-
-### Via Nimble (Recommended)
 ```bash
 nimble install nimtest
 ```
 
-### Basic Usage
-The recommended way to use nimtest is through the API module:
+## Quick Example
+
+```nim
+import nimtest/api   # ← ONE IMPORT TO RULE THEM ALL
+
+var ctx = createTestContext()
+try:
+  let dir = createTempTestDir(ctx, "demo")
+  let f = createTestFile(ctx, dir, "hello.txt", "world")
+  discard assertFileContains(f, "world")
+finally:
+  ctx.cleanup()
+```
+
+## Writing Tests
+
+### Basic Test Structure
 
 ```nim
 import nimtest/api
 import std/unittest
 
-suite "My Basic Tests":
+suite "My Tests":
+  var ctx: TestContext
+
+  setup:
+    ctx = createTestContext()
+
+  teardown:
+    ctx.cleanup()
+
+  test "basic functionality":
+    let tempDir = createTempTestDir(ctx, "test")
+    let tempFile = createTestFile(ctx, tempDir, "test.txt", "content")
+
+    # Assertions
+    discard assertFileExists(tempFile)
+    discard assertFileContains(tempFile, "content")
+```
+
+### Test Context Management
+
+The `TestContext` is the core of nimtest's resource management:
+
+```nim
+# Create context
+var ctx = createTestContext()
+
+try:
+  # Create temporary resources
+  let tempDir = createTempTestDir(ctx, "my_test")
+  let tempFile = createTestFile(ctx, tempDir, "data.txt", "test data")
+
+  # Use resources in tests
+  check fileExists(tempFile)
+
+finally:
+  # Automatic cleanup
+  ctx.cleanup()
+```
+
+### File System Operations
+
+nimtest provides comprehensive file system testing utilities:
+
+```nim
+# Basic assertions
+discard assertFileExists("path/to/file")
+discard assertDirExists("path/to/directory")
+discard assertFileContains("file.txt", "expected content")
+discard assertFileHasSize("file.bin", 1024)
+
+# Negative assertions
+discard assertFileNotExists("should/not/exist")
+discard assertFileDoesNotContain("file.txt", "forbidden text")
+```
+
+### Performance Testing
+
+Built-in benchmarking and timing utilities:
+
+```nim
+# Simple timing
+let duration = measureTime("database query"):
+  proc() =
+    # Your code to time
+    sleep(100)
+
+# Benchmarking with statistics
+let results = benchmark("string operation", 1000):
+  proc() =
+    var s = ""
+    for i in 0..100:
+      s &= "test"
+
+echo &"Average: {results.avg:.3f}ms, Min: {results.min:.3f}ms, Max: {results.max:.3f}ms"
+```
+
+### Progress Bars
+
+Five animated progress bar styles for visual feedback:
+
+```nim
+# Create progress bar
+let bar = newProgressBar(pbsGlobe, total = 100, message = "Processing...")
+
+# Update progress
+for i in 0..99:
+  # Do work here
+  bar.update(i + 1, &"Completed {i + 1}/100")
+
+# Finish
+bar.finish("All tasks completed!")
+```
+
+### Test Reporting
+
+Generate comprehensive reports in multiple formats:
+
+```nim
+# Create report
+var report = newTestSuiteReport("My Test Suite")
+
+# Add results
+addResult(report, newTestResult("test 1", true, 0.001, "passed"))
+addResult(report, newTestResult("test 2", false, 0.002, "failed"))
+
+# Finish and generate reports
+finish(report)
+
+# Console output (human-readable)
+generateConsoleReport(report)
+
+# Save to files
+let junitFile = saveReport(report, rfJunit, "results.xml")
+let jsonFile = saveReport(report, rfJson, "results.json")
+let mdFile = saveReport(report, rfMarkdown, "results.md")
+```
+
+### CLI Testing (Planned)
+
+CLI testing utilities are planned for future releases:
+
+```nim
+# Future API (not yet implemented)
+let (output, exitCode) = runCliCommand("--version")
+check exitCode == 0
+assertOutputContains(output, "1.0.0")
+```
+
+## Advanced Usage
+
+### Custom Assertions
+
+Create custom assertions using the framework:
+
+```nim
+proc assertJsonFileContains*(path: string, key: string, expectedValue: string) =
+  discard assertFileExists(path)
+  let content = readFile(path)
+  let json = parseJson(content)
+  if json[key].getStr() != expectedValue:
+    raise newException(AssertionDefect, &"JSON key '{key}' has value '{json[key].getStr()}', expected '{expectedValue}'")
+```
+
+### Integration Testing
+
+Use nimtest for integration tests:
+
+```nim
+test "full workflow":
+  var ctx = createTestContext()
+  try:
+    # Setup test environment
+    let projectDir = createTempTestDir(ctx, "integration")
+
+    # Simulate project creation
+    let configFile = createTestFile(ctx, projectDir, "config.json", """{"debug": true}""")
+
+    # Test your application logic
+    # ... application code ...
+
+    # Verify results
+    discard assertFileExists(projectDir / "output.txt")
+    discard assertFileContains(projectDir / "output.txt", "success")
+
+  finally:
+    ctx.cleanup()
+```
+
+### CI/CD Integration
+
+nimtest works seamlessly with CI/CD systems:
+
+```bash
+# Run tests
+nimble test
+
+# Generate JUnit reports for CI
+nim c -r tests/my_tests.nim --junit-report=test_results.xml
+
+# Generate JSON reports for analysis
+nim c -r tests/my_tests.nim --json-report=test_results.json
+```
+
+## Best Practices
+
+### Resource Management
+- Always use `TestContext` for temporary resources
+- Call `ctx.cleanup()` in teardown blocks
+- Use descriptive prefixes for temp directories
+
+### Test Organization
+- Group related tests in suites
+- Use descriptive test names
+- Keep tests focused and atomic
+
+### Performance Testing
+- Use `benchmark()` for operations that should be measured
+- Set appropriate iteration counts
+- Compare results against baselines
+
+### Error Handling
+- Let assertions throw exceptions for test failures
+- Use `try/except` blocks sparingly in tests
+- Check error messages in assertions when needed
+
+## Troubleshooting
+
+### Common Issues
+
+**Tests not cleaning up properly:**
+- Ensure `ctx.cleanup()` is called in teardown
+- Check that all resources are created through the context
+
+**Performance tests showing inconsistent results:**
+- Run benchmarks multiple times
+- Use higher iteration counts for stable results
+- Isolate performance tests from other operations
+
+**File system assertions failing:**
+- Verify file paths are correct
+- Check file permissions
+- Ensure files are created before assertions
+
+## Migration Guide
+
+### From unittest
+
+If migrating from Nim's standard unittest:
+
+```nim
+# Old way
+import unittest
+
+suite "old tests":
+  test "basic":
+    check(1 + 1 == 2)
+
+# New way with nimtest
+import nimtest/api
+import unittest
+
+suite "new tests":
+  var ctx: TestContext
+
+  setup:
+    ctx = createTestContext()
+
+  teardown:
+    ctx.cleanup()
+
+  test "basic":
+    check(1 + 1 == 2)
+
+  test "with resources":
+    let tempFile = createTestFile(ctx, createTempTestDir(ctx, "test"), "test.txt", "content")
+    discard assertFileContains(tempFile, "content")
+```
+
+## API Reference
+
+See [API.md](API.md) for complete function documentation.
   var ctx: TestContext
 
   setup:

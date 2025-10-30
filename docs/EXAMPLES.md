@@ -2,52 +2,342 @@
 
 Common testing scenarios and patterns using the nimtest framework.
 
-## Table of Contents
+## Install
 
-- [Basic Unit Testing](#basic-unit-testing)
-- [File System Testing](#file-system-testing)
-- [Performance Testing](#performance-testing)
-- [Progress Bars](#progress-bars)
-- [Error Handling Testing](#error-handling-testing)
-- [Database Testing](#database-testing)
-- [API Testing](#api-testing)
-- [Complex Scenarios](#complex-scenarios)
-
-## Basic Unit Testing
-
-### Simple Value Testing
-
-```nim
-import nimtest/api
-import std/[unittest, os]
-
-# Test basic functionality
-proc add(a, b: int): int = a + b
-proc multiply(a, b: int): int = a * b
-
-# Direct function tests with nimtest utilities
-let result1 = add(2, 3)
-if result1 != 5:
-  raise newException(AssertionDefect, "add(2, 3) should equal 5")
-
-let result2 = add(-1, 1)
-if result2 != 0:
-  raise newException(AssertionDefect, "add(-1, 1) should equal 0")
-
-let result3 = multiply(3, 4)
-if result3 != 12:
-  raise newException(AssertionDefect, "multiply(3, 4) should equal 12")
+```bash
+nimble install nimtest
 ```
 
-### Testing with Resource Management
+## Quick Example
 
 ```nim
 import nimtest/api
-import std/[os, times]
 
-# Example calculator type
-type Calculator = ref object
-  value: int
+var ctx = createTestContext()
+try:
+  let dir = createTempTestDir(ctx, "demo")
+  let f = createTestFile(ctx, dir, "hello.txt", "world")
+  discard assertFileContains(f, "world")
+finally:
+  ctx.cleanup()
+```
+
+## Basic File Testing
+
+See [examples/basic_file_test.nim](../examples/basic_file_test.nim):
+
+```nim
+import ../src/nimtest/api
+
+var ctx = createTestContext()
+try:
+  let f = createTestFile(ctx, createTempTestDir(ctx), "x.txt", "hi")
+  discard assertFileContains(f, "hi")
+finally:
+  ctx.cleanup()
+```
+
+## Performance Benchmarking
+
+See [examples/benchmark.nim](../examples/benchmark.nim):
+
+```nim
+import ../src/nimtest/api
+
+echo "Benchmarking Example"
+echo "==================="
+
+# Performance benchmarking
+discard benchmark("string concatenation", 1000):
+  proc() =
+    var s = ""
+    for i in 0..100:
+      s &= "test"
+
+discard benchmark("array operations", 1000):
+  proc() =
+    var arr = newSeq[int](100)
+    for i in 0..99:
+      arr[i] = i * 2
+
+echo "Benchmarking completed!"
+```
+
+## CLI Testing (Future)
+
+See [examples/cli_test.nim](../examples/cli_test.nim):
+
+```nim
+# CLI Testing Example (planned for future release)
+# Note: CLI testing utilities would be implemented in helpers.nim
+
+echo "CLI Testing Example"
+echo "=================="
+
+# Example of how CLI testing would work:
+# let (output, exitCode) = runCliCommand("--version")
+# check exitCode == 0
+# assertOutputContains(output, "1.0.0")
+
+echo "CLI testing utilities not yet implemented"
+echo "This would test command-line interfaces"
+```
+
+## Common Testing Patterns
+
+### File System Testing
+
+```nim
+test "file operations":
+  var ctx = createTestContext()
+  try:
+    let tempDir = createTempTestDir(ctx, "file_test")
+    let tempFile = createTestFile(ctx, tempDir, "test.txt", "Hello, World!")
+
+    # Basic assertions
+    discard assertFileExists(tempFile)
+    discard assertFileContains(tempFile, "Hello")
+    discard assertFileHasSize(tempFile, 13)  # "Hello, World!" is 13 chars
+
+    # Negative assertions
+    discard assertFileNotExists(tempDir / "nonexistent.txt")
+
+  finally:
+    ctx.cleanup()
+```
+
+### Directory Testing
+
+```nim
+test "directory operations":
+  var ctx = createTestContext()
+  try:
+    let tempDir = createTempTestDir(ctx, "dir_test")
+    let subDir = createTempTestDir(ctx, tempDir / "subdir")
+    let tempFile = createTestFile(ctx, subDir, "file.txt", "content")
+
+    # Directory assertions
+    discard assertDirExists(tempDir)
+    discard assertDirExists(subDir)
+    discard assertFileExists(tempFile)
+
+  finally:
+    ctx.cleanup()
+```
+
+### Performance Testing
+
+```nim
+test "performance benchmarks":
+  # Simple timing
+  let duration = measureTime("simple operation"):
+    proc() =
+      var sum = 0
+      for i in 0..1000:
+        sum += i
+
+  # Detailed benchmarking
+  let results = benchmark("array sum", 1000):
+    proc() =
+      var arr = newSeq[int](100)
+      for i in 0..99:
+        arr[i] = i * i
+      discard arr.foldl(a + b, 0)
+
+  check results.avg > 0
+  check results.total > 0
+```
+
+### Progress Visualization
+
+```nim
+test "progress bars":
+  let bar = newProgressBar(pbsGlobe, total = 10, message = "Processing")
+
+  for i in 0..9:
+    # Simulate work
+    sleep(100)
+    bar.update(i + 1, &"Step {i + 1}/10")
+
+  bar.finish("All steps completed!")
+```
+
+### Test Reporting
+
+```nim
+test "comprehensive reporting":
+  var report = newTestSuiteReport("Example Tests")
+
+  # Add various test results
+  addResult(report, newTestResult("basic test", true, 0.001, "passed"))
+  addResult(report, newTestResult("slow test", true, 0.500, "completed slowly"))
+  addResult(report, newTestResult("failed test", false, 0.002, "assertion failed"))
+
+  finish(report)
+
+  # Generate different report formats
+  generateConsoleReport(report)  # Human-readable output
+
+  let jsonFile = saveReport(report, rfJson, "report.json")
+  let junitFile = saveReport(report, rfJunit, "report.xml")
+  let mdFile = saveReport(report, rfMarkdown, "report.md")
+
+  # Verify reports were created
+  discard assertFileExists(jsonFile)
+  discard assertFileExists(junitFile)
+  discard assertFileExists(mdFile)
+```
+
+### Error Testing
+
+```nim
+test "error conditions":
+  # Test that exceptions are thrown
+  expect AssertionDefect:
+    discard assertFileExists("nonexistent_file.txt")
+
+  # Test custom error messages
+  try:
+    discard assertFileContains("nonexistent_file.txt", "content")
+  except AssertionDefect as e:
+    check "File does not exist" in e.msg
+```
+
+### Integration Testing
+
+```nim
+test "integration scenario":
+  var ctx = createTestContext()
+  try:
+    # Setup test environment
+    let projectDir = createTempTestDir(ctx, "integration")
+    let configFile = createTestFile(ctx, projectDir, "config.json", """{"debug": true}""")
+    let dataDir = createTempTestDir(ctx, projectDir / "data")
+
+    # Simulate application workflow
+    let inputFile = createTestFile(ctx, dataDir, "input.txt", "test input")
+    let outputFile = createTestFile(ctx, dataDir, "output.txt", "processed output")
+
+    # Verify complete workflow
+    discard assertFileExists(configFile)
+    discard assertFileExists(inputFile)
+    discard assertFileExists(outputFile)
+    discard assertDirExists(dataDir)
+
+    # Verify content
+    discard assertFileContains(configFile, "debug")
+    discard assertFileContains(inputFile, "test input")
+    discard assertFileContains(outputFile, "processed")
+
+  finally:
+    ctx.cleanup()
+```
+
+### Custom Assertions
+
+```nim
+# Custom assertion for JSON files
+proc assertJsonFileContains*(path: string, key: string, expectedValue: string) =
+  discard assertFileExists(path)
+  let content = readFile(path)
+  let json = parseJson(content)
+  if json[key].getStr() != expectedValue:
+    raise newException(AssertionDefect, &"JSON key '{key}' has value '{json[key].getStr()}', expected '{expectedValue}'")
+
+test "JSON file validation":
+  var ctx = createTestContext()
+  try:
+    let jsonFile = createTestFile(ctx, createTempTestDir(ctx, "json_test"), "config.json",
+      """{"name": "test", "version": "1.0"}""")
+
+    assertJsonFileContains(jsonFile, "name", "test")
+    assertJsonFileContains(jsonFile, "version", "1.0")
+
+  finally:
+    ctx.cleanup()
+```
+
+## Advanced Patterns
+
+### Test Fixtures
+
+```nim
+# Setup complex test data
+proc createTestProject(ctx: TestContext): string =
+  let projectDir = createTempTestDir(ctx, "project")
+  let srcDir = createTempTestDir(ctx, projectDir / "src")
+  let testDir = createTempTestDir(ctx, projectDir / "tests")
+
+  discard createTestFile(ctx, srcDir, "main.nim", "echo \"Hello\"")
+  discard createTestFile(ctx, testDir, "test_main.nim", "check true")
+
+  return projectDir
+
+test "project structure":
+  var ctx = createTestContext()
+  try:
+    let projectDir = createTestProject(ctx)
+
+    discard assertDirExists(projectDir / "src")
+    discard assertDirExists(projectDir / "tests")
+    discard assertFileExists(projectDir / "src" / "main.nim")
+    discard assertFileExists(projectDir / "tests" / "test_main.nim")
+
+  finally:
+    ctx.cleanup()
+```
+
+### Parameterized Tests
+
+```nim
+# Test multiple scenarios
+let testCases = [
+  ("empty", "", 0),
+  ("single char", "a", 1),
+  ("word", "hello", 5),
+  ("sentence", "hello world", 11)
+]
+
+for (name, input, expectedLen) in testCases:
+  test &"string length - {name}":
+    check input.len == expectedLen
+```
+
+### Async Testing (Future)
+
+```nim
+# Future async testing support
+test "async operations":
+  # This would work with async/await
+  # let result = await someAsyncOperation()
+  # check result == expected
+  skip("Async testing not yet implemented")
+```
+
+## Running Examples
+
+All examples can be run individually:
+
+```bash
+nim c -r examples/basic_file_test.nim
+nim c -r examples/benchmark.nim
+```
+
+Or run all tests:
+
+```bash
+nimble test
+```
+
+## Contributing Examples
+
+When adding new examples:
+
+1. Place them in the `examples/` directory
+2. Use relative imports: `import ../src/nimtest/api`
+3. Include clear comments explaining the pattern
+4. Test that they run successfully
+5. Update this documentation
 
 proc newCalculator(): Calculator = Calculator(value: 0)
 proc reset(calc: Calculator) = calc.value = 0
