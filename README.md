@@ -3,14 +3,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/codenimja/nimtest/ci.yml?branch=main&style=flat-square)](https://github.com/codenimja/nimtest/actions)
-[![nimble](https://img.shields.io/badge/nimble-v0.1.0-blue.svg?style=flat-square)](https://github.com/nim-lang/nimble)
+[![Nimble](https://img.shields.io/endpoint?url=https://nimble.directory/pkg/nimtest/badge)](https://nimble.directory/pkg/nimtest)
 
 nimtest is a comprehensive testing package for Nim projects, providing utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and rich reporting.
 
 ## Install
 
 ```bash
-nimble install nimtest-framework
+nimble install nimtest
 ```
 
 ## Quick Example
