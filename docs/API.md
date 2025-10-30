@@ -1,53 +1,26 @@
-# nimtest API Reference
-
-Complete API documentation for the nimtest framework.
+# API Reference
 
 ```nim
 import nimtest/api
 ```
 
 ## Core
-
-- `createTestContext()` → TestContext
+- `createTestContext()` → `TestContext`
 - `cleanup(ctx)`
-- `tryCleanup(ctx): tuple[success: bool, errors: seq[string]]`
-- `createTempTestDir(ctx, prefix): string`
-- `createTestFile(ctx, dir, name, content): string`
+- `createTempTestDir(ctx, "prefix")`
 
 ## Assertions
+- `assertFileExists(path)`
+- `assertFileContains(path, "text")`
+- `assertThrows(proc, Exception)`
 
-- `assertFileExists(path, msg = ""): bool`
-- `assertDirExists(path, msg = ""): bool`
-- `assertFileContains(path, content, msg = ""): bool`
-- `assertFileContainsFast(path, content, msg = ""): bool`
-- `assertFileNotExists(path, msg = ""): bool`
-- `assertDirNotExists(path, msg = ""): bool`
-- `assertFileDoesNotContain(path, content, msg = ""): bool`
-- `assertFileHasSize(path, expectedSize, msg = ""): bool`
-- `assertFileModifiedAfter(path, time, msg = ""): bool`
-- `assertThrows(proc, ExceptionType, msg = ""): bool`
-- `assertOutputDoesNotContain(output, unexpected, msg = ""): bool`
+## Reporting
+- `newTestSuiteReport("name")`
+- `saveReport(report, rfJunit, "out.xml")`
 
-## Performance
-
-- `measureTime(label, body): float`
-- `benchmark(label, iterations, body): tuple[avg, min, max, total]`
-
-## Progress Bars
-
-- `newProgressBar(style, width = 40, total = 100, message = ""): ProgressBar`
-- `update(bar, current, msg = "")`
-- `render(bar): string`
-- `display(bar)`
-- `finish(bar, message = "Complete!")`
-
-### Progress Bar Styles
-
-- `pbsMinimal` - Simple bar with percentage
-- `pbsGlobe` - Globe-like rotating progress
-- `pbsPulse` - Pulsing bar with subtle animation
-- `pbsDots` - Animated dots
-- `pbsBlocks` - Unicode block characters
+## Progress
+- `newProgressBar(pbsGlobe, total=100)`
+- `bar.display()`
 
 ## Reporting
 

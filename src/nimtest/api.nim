@@ -1,5 +1,3 @@
-## Public API - import this only
-import ./core, ./reporting, ./config, ./progress, ./helpers
-
-# Re-export all symbols from the modules so they're available directly
-export core, reporting, config, progress, helpers
+## Public API – **import nimtest/api**
+import core, helpers, reporting, progress, config
+export core, helpers, reporting, progress, config

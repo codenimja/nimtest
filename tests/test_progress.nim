@@ -12,7 +12,7 @@ suite "nimtest progress":
 
   test "progress bar rendering":
     var bar = newProgressBar(pbsBlocks, width = 10, total = 10, message = "Loading")
-    update(bar, 7)
+    updateProgress(bar, 7)
     
     let rendered = render(bar)
     check rendered.len > 0

@@ -1,52 +1,9 @@
 # Contributing to nimtest
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Nim](https://img.shields.io/badge/Nim-1.6+-blue.svg)](https://nim-lang.org/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/yourusername/nimtest/pulls)
-
-Guidelines and information for contributors to the nimtest testing framework.
-
-## Install
-
-```bash
-git clone https://github.com/yourusername/nimtest.git
-cd nimtest
-nimble install
-```
-
-## Quick Example
-
-```nim
-# Clone and setup
-git clone https://github.com/yourusername/nimtest.git
-cd nimtest
-
-# Create a feature branch
-git checkout -b feature/new-assertion
-
-# Make changes and test
-nim c -r examples/test_all.nim
-
-# Commit and push
-git add .
-git commit -m "feat: add new assertion function"
-git push origin feature/new-assertion
-```
-
-## Getting Started
-
-### Prerequisites
-
-- **Nim**: Version 1.6.0 or later (2.0.0 recommended)
-- **Git**: For version control
-- **Terminal**: Bash or compatible shell
-
-### Development Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/nimtest.git
-cd nimtest
+1. Fork & clone
+2. `nimble test`
+3. Open PR with clear title
+4. Reference issues
 
 # Install dependencies
 nimble refresh

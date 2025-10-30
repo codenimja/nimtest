@@ -134,22 +134,22 @@ proc display*(bar: ProgressBar) =
   stdout.write("\r" & render(bar))
   stdout.flushFile()
 
-proc update*(bar: ProgressBar, current: int, msg = "") =
+proc updateProgress*(bar: ProgressBar, current: int, message = "") =
   ## Update progress bar with optimization to avoid spam - only update every 50ms
   let now = getTime()
   if (now - bar.lastUpdate).inMilliseconds > 50:  # Optimization from PDD
     bar.current = min(current, bar.total)
     if bar.current > bar.maxValue:
       bar.maxValue = bar.current
-    if msg.len > 0:
-      bar.message = msg
+    if message.len > 0:
+      bar.message = message
     bar.lastUpdate = now
     display(bar)
 
-proc finish*(bar: ProgressBar, message: string = "Complete!") =
+proc finish*(bar: ProgressBar, finalMsg = "") =
   ## Finish the progress bar by setting to 100% and displaying
   bar.current = bar.total
-  bar.message = message
+  bar.message = finalMsg
   display(bar)
   echo ""  # New line
 
@@ -158,7 +158,7 @@ export
   ProgressBarStyle,
   ProgressBar,
   newProgressBar,
-  update,
+  updateProgress,
   render,
   display,
   finish

@@ -410,7 +410,7 @@ proc runTestsWithProgress*(testSuites: seq[tuple[name: string, testProc: proc() 
   for i, (suiteName, testProc) in testSuites:
     # Using the optimized update method that only updates every 50ms to avoid spam
     let msg = "Running " & suiteName & "..."
-    progress.update(progressBar, i, msg)
+    progress.updateProgress(progressBar, i, msg)
     
     let startTime = getTime()
     var passed = true

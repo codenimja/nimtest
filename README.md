@@ -1,21 +1,3 @@
-# nimtest
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/codenimja/nimtest/ci.yml?branch=main&style=flat-square)](https://github.com/codenimja/nimtest/actions)
-[![nimble](https://img.shields.io/badge/nimble-v0.1.0-blue.svg?style=flat-square)](https://github.com/codenimja/nimtest)
-
-nimtest is a comprehensive testing package for Nim projects, providing utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and rich reporting.
-
-## Install
-
-```bash
-nimble install nimtest
-```
-
-## Usage
-
-```nim
 # nimtest — The Only Testing Framework You'll Ever Need
 
 ```nim
@@ -23,31 +5,34 @@ import nimtest/api   # ← ONE IMPORT TO RULE THEM ALL
 ```
 
 ## Install
-
 ```bash
 nimble install nimtest
 ```
 
-## Quick Example
-
+## Quick Start
 ```nim
 var ctx = createTestContext()
 try:
-  let dir = createTempTestDir(ctx, "demo")
-  let f = createTestFile(ctx, dir, "hello.txt", "world")
+  let d = createTempTestDir(ctx, "demo")
+  let f = createTestFile(ctx, d, "hello.txt", "world")
   discard assertFileContains(f, "world")
 finally:
   ctx.cleanup()
 ```
 
 ## Features
-
-- Auto-cleanup via TestContext
-- 4 report formats (including JUnit XML)
+- Auto-cleanup via `TestContext`
+- 4 report formats (Console, JSON, JUnit XML, Markdown)
 - 5 animated progress bars
 - Full CLI testing
-- Benchmarks with benchmark()
-- nimble test ready
+- Benchmarks with `benchmark()`
+- `nimble test` ready
+- Full docs in [`docs/`](./docs/)
+
+## Links
+- [Documentation](./docs/)
+- [Changelog](./CHANGELOG.md)
+- [Contributing](./docs/CONTRIBUTING.md)
 ```
 
 ## Features
