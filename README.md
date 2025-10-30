@@ -1,56 +1,50 @@
-# nimtest - Comprehensive Testing Framework for Nim
+# nimtest - The Premier Testing Framework for Nim
 
-A modular testing framework for Nim projects that provides utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and comprehensive reporting.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg)](https://nim-lang.org/)
+[![Build Status](https://github.com/codenimja/nimtest/workflows/CI/badge.svg)](https://github.com/codenimja/nimtest/actions)
 
-## Project Status
+**nimtest** is the most comprehensive and professional testing framework designed exclusively for Nim projects. As the only dedicated Nim testing suite, it provides unparalleled testing capabilities with automatic resource management, rich reporting, and cross-platform support.
 
-This project is production-ready and follows modern Nim best practices. It provides a lightweight, fast, and beautiful testing solution with a clean architecture that's easy to integrate into any Nim project.
+**Keywords:** nim testing, nim test framework, nim unit tests, nim integration tests, nim cli testing, nim performance benchmarks, nim test suite, nim testing tools, nim development, nim programming
 
-## Features
+nimtest is a comprehensive testing framework for Nim projects, providing utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and rich reporting.
 
-- **Comprehensive Testing Utilities**: File operations, assertions, CLI testing, performance benchmarking
-- **Resource Management**: Automatic cleanup of temporary files and directories via TestContext
-- **Rich Reporting**: Console, JSON, JUnit XML, and Markdown report formats
-- **Progress Bars**: Subtle loading indicators (5 styles: minimal, globe, pulse, dots, blocks)
-- **Performance Utilities**: Built-in timing and benchmarking tools
-- **File System Testing**: Extensive file and directory assertion utilities
-- **Cross-Platform**: Works on Linux, macOS, and Windows
-- **Highly Configurable**: Easy to customize for your specific project needs
-- **Well Documented**: Complete API documentation and usage guides
-- **Nimble Installable**: Install via `nimble install nimtest`
-
-## Quick Start
-
-### 1. Installation
-
-Install via Nimble (recommended):
+## Install
 
 ```bash
 nimble install nimtest
-# or
-nimble install https://github.com/codenimja/nimtest
 ```
 
-### 2. Basic Usage
+## Usage
 
 ```nim
 import nimtest/api
 
 var ctx = createTestContext()
 try:
-  let f = createTestFile(ctx, createTempTestDir(ctx), "x.txt", "hi")
-  discard assertFileContains(f, "hi")
+  let tempDir = createTempTestDir(ctx, "test")
+  let testFile = createTestFile(ctx, tempDir, "test.txt", "content")
+  
+  discard assertFileExists(testFile)
+  discard assertFileContains(testFile, "content")
 finally:
   ctx.cleanup()
 ```
 
-### 3. Run Tests
+## Features
 
-```bash
-nimble test
-# or
-nim c -r tests/my_test.nim
-```
+- Automatic resource management with TestContext
+- File system testing utilities
+- CLI testing support
+- Performance benchmarking
+- Multiple report formats (console, JSON, JUnit XML, Markdown)
+- Progress bars
+- Cross-platform support
+
+## Documentation
+
+See [docs/](docs/) for comprehensive documentation, API reference, and examples.
 
 ## Core Concepts
 

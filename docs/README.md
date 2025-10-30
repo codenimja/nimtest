@@ -4,8 +4,7 @@ A comprehensive, modular testing framework for Nim projects.
 
 ## Overview
 
-nimtest is a professional testing framework that provides utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and comprehensive reporting:
-- CLI command testing (with `runCliCommand` utility)
+nimtest is a professional testing framework that provides utilities for unit tests, integration tests, and performance benchmarks with automatic resource management and comprehensive reporting:
 - Resource management (with `TestContext` for automatic cleanup)
 - File system assertions (file and directory validation utilities)
 - Performance testing (timing and benchmarking utilities)

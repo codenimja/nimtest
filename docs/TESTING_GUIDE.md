@@ -171,10 +171,9 @@ suite "Integration Tests":
     let buttonFile = createTestFile(ctx, srcDir, "button.nim", "echo \"Button component\"")
     discard assertFileExists(buttonFile)
     
-    # Step 3: List components
-    let (listOut, listCode) = runCliCommandInDir(projectDir, "list")
-    check listCode == 0
-    assertOutputContains(listOut, "button")
+    # Step 3: Verify component
+    discard assertFileContains(buttonFile, "Button component")
+    discard assertFileExists(buttonFile)
 ```
 
 ### Reporting Test Results
