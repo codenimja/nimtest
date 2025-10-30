@@ -10,7 +10,7 @@ nimtest is a comprehensive testing package for Nim projects, providing utilities
 ## Install
 
 ```bash
-nimble install nimtest
+nimble install nimtest-framework
 ```
 
 ## Quick Example
