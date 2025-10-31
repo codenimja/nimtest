@@ -10,7 +10,6 @@
 [![CI](https://github.com/codenimja/nimtest/actions/workflows/ci.yml/badge.svg)](https://github.com/codenimja/nimtest/actions)
 [![nimpkgs](https://img.shields.io/endpoint?url=https://nimpkgs.ci/badge/nimtest)](https://nimpkgs.ci)
 [![Docs](https://img.shields.io/badge/docs-latest-blue)](https://codenimja.github.io/nimtest/)
-[![Docs](https://img.shields.io/badge/docs-latest-blue)](https://codenimja.github.io/nimtest/)
 
 **Install**: `nimble install nimtest`
 
@@ -32,6 +31,7 @@
 - [Examples](#examples)
 - [CI/CD Integration](#cicd-integration)
 - [Best Practices](#best-practices)
+- [Roadmap](#roadmap)
 - [FAQ](#faq)
 - [Contributing](#contributing)
 - [Support](#support)
@@ -331,6 +331,17 @@ jobs:
 - **Benchmark with sufficient iterations** (1000+) for accurate results
 - **Test CLI commands** with both success and failure cases
 - **Use descriptive names** for benchmarks and test results
+
+## Roadmap
+
+nimtest has an ambitious roadmap for 2026 focused on usability, performance, and observability. See [ROADMAP.md](../ROADMAP.md) for the complete strategic plan including:
+
+- **Q1 2026 (v1.1)**: Macro DSL for tests, CLI runner binary, enhanced assertions
+- **Q2 2026 (v1.2)**: Parallel execution, async/await support, E2E integration lanes
+- **Q3 2026 (v1.3)**: Interactive HTML reports, coverage integration, fuzzing hooks
+- **Q4 2026+**: Wild cards including AI-assisted test generation and compile-time fuzzing
+
+**Contribute**: Help shape the future by participating in roadmap discussions on the [Nim Forum](https://forum.nim-lang.org/) or [GitHub Discussions](https://github.com/codenimja/nimtest/discussions).
 
 ## FAQ
 
