@@ -6,7 +6,7 @@
 [![CI](https://github.com/codenimja/nimtest/actions/workflows/ci.yml/badge.svg)](https://github.com/codenimja/nimtest/actions)
 [![Docs](https://img.shields.io/badge/docs-latest-blue)](https://codenimja.github.io/nimtest/)
 
-**"The only Nim test framework that ships with lock-free progress bars, JUnit reports, and a soul."**
+**A comprehensive testing framework for Nim with automatic resource management, CLI testing, and CI/CD integration.**
 
 ## One-Liner Power
 
@@ -15,7 +15,7 @@
 nimble install nimtest && echo 'test "hello"' > tests/t_hello.nim && nimtest
 ```
 
-→ Instant dopamine. Devs will try it just to see the globe spin.
+→ Get started quickly with comprehensive testing utilities.
 
 ## Install
 

@@ -4,7 +4,7 @@
 
 Hey Nim Community! 🚀
 
-I'm excited to announce **nimtest v1.0** - a comprehensive testing framework that brings modern testing capabilities to Nim with style and soul.
+I'm excited to announce **nimtest v1.0** - a comprehensive testing framework that brings modern testing capabilities to Nim with automatic resource management and CI/CD integration.
 
 ### What Makes nimtest Special?
 

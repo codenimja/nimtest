@@ -1,6 +1,6 @@
 # nimtest v1.0 Documentation
 
-> **The only Nim test framework that ships with lock-free progress bars, JUnit reports, and a soul.**
+> **A comprehensive testing framework for Nim with automatic resource management, CLI testing, and CI/CD integration.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
