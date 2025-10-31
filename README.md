@@ -4,10 +4,18 @@
 [![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/codenimja/nimtest/ci.yml?branch=main&style=flat-square)](https://github.com/codenimja/nimtest/actions)
 [![Nimble Package](https://img.shields.io/badge/nimble-package-blue.svg?style=flat-square)](https://github.com/nim-lang/packages)
+[![nimpkgs](https://img.shields.io/endpoint?url=https://nimpkgs.ci/badge/nimtest)](https://nimpkgs.ci)
 
 **"The only Nim test framework that ships with lock-free progress bars, JUnit reports, and a soul."**
 
-nimtest is a comprehensive testing framework for Nim projects, providing utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and multiple reporting formats.
+## One-Liner Hook
+
+```bash
+# One command to test like a god:
+nimble install nimtest && echo 'test "hello"' > tests/t_hello.nim && nimtest
+```
+
+→ Instant dopamine. Devs will try it just to see the globe spin.
 
 ## Install
 

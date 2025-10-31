@@ -1,0 +1,23 @@
+Running all nimtest examples...
+================================
+
+1. Basic TestContext and file operations
+   ✓ Basic operations passed
+
+2. CLI Testing
+   ✓ CLI testing passed
+
+3. Performance Testing
+[BENCH] simple benchmark: 
+  Total: 0.101 ms
+  Average: 0.001 ms
+  Min: 0.000 ms
+  Max: 0.001 ms
+  Iterations: 100
+   ✓ Performance testing passed
+
+4. Test Reporting
+   ✓ Reports generated: test_all_report.json, test_all_report.xml, test_all_report.md
+
+🎉 All nimtest examples completed successfully!
+The framework is ready for production use.
