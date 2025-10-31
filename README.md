@@ -1,11 +1,13 @@
-# nimtest — The Only Testing Framework You'll Ever Need
+# nimtest v1.0 — CI-Ready Testing with Lock-Free Progress Bars
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/codenimja/nimtest/ci.yml?branch=main&style=flat-square)](https://github.com/codenimja/nimtest/actions)
 [![Nimble Package](https://img.shields.io/badge/nimble-package-blue.svg?style=flat-square)](https://github.com/nim-lang/packages)
 
-nimtest is a comprehensive testing package for Nim projects, providing utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and rich reporting.
+**"The only Nim test framework that ships with lock-free progress bars, JUnit reports, and a soul."**
+
+nimtest is a comprehensive testing framework for Nim projects, providing utilities for unit tests, integration tests, CLI testing, and performance benchmarks with automatic resource management and multiple reporting formats.
 
 ## Install
 
@@ -13,28 +15,50 @@ nimtest is a comprehensive testing package for Nim projects, providing utilities
 nimble install nimtest
 ```
 
-## Quick Example
+## One-Liner Power
 
 ```nim
-import nimtest/api   # ← ONE IMPORT TO RULE THEM ALL
+import nimtest/api
 
 var ctx = createTestContext()
 try:
-  let dir = createTempTestDir(ctx, "demo")
-  let f = createTestFile(ctx, dir, "hello.txt", "world")
-  discard assertFileContains(f, "world")
+  let file = createTestFile(ctx, "test.txt", "hello")
+  discard assertFileContains(file, "hello")
 finally:
   ctx.cleanup()
 ```
 
-## Features
+## Core Features
 
-- Auto-cleanup via TestContext
-- 4 report formats (including JUnit XML)
-- 5 animated progress bars
-- Full CLI testing
-- Benchmarks with benchmark()
-- nimble test ready
+| Feature | Killer Detail |
+|---------|---------------|
+| TestContext | `createTestContext()` → `ctx.cleanup()` in finally |
+| File Testing | `assertFileContains()`, `createTempTestDir()` |
+| CLI Testing | `runCliCommand()`, `assertExitCode()` |
+| Perf Testing | `benchmark("op", 10_000): proc()` |
+| Reporting | `saveReport(rfJunit, "ci.xml")` |
+| Progress Bars | `pbsGlobe`, `pbsSpinner`, `pbsBar` — lock-free |
+| Cross-Platform | Linux, macOS, Windows |
+
+## CI/CD Integration
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jiro4989/setup-nim-action@v2
+      - run: nimble install nimtest
+      - run: nim c -r tests/all_tests.nim
+      - uses: actions/upload-artifact@v3
+        with:
+          name: junit-report
+          path: test-results.xml
+```
 
 ## Documentation
 

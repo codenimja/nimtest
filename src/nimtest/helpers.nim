@@ -1,7 +1,7 @@
 ## Additional test helper utilities - Nim Test Framework
 ## Extended helper functions beyond core functionality
 
-import std/[os, strutils, times]
+import std/[os, strutils, times, osproc]
 # Import statements for core and config are intentionally commented out
 # as they're not currently used but kept for future extensibility
 
@@ -149,6 +149,48 @@ proc benchmark*(label: string, iterations: int, body: proc()): tuple[avg: float,
 
   return (avg: avgTime, min: minTime, max: maxTime, total: totalTime)
 
+# =========================
+# CLI Testing Utilities
+# =========================
+
+proc runCliCommand*(command: string, workingDir: string = ""): tuple[output: string, exitCode: int] =
+  ## Execute a CLI command and return its output and exit code
+  ## 
+  ## Parameters:
+  ##   command: The command to execute
+  ##   workingDir: Optional working directory (defaults to current)
+  ##
+  ## Returns:
+  ##   Tuple of (output: string, exitCode: int)
+  if command.len == 0:
+    raise newException(ValueError, "Command cannot be empty")
+  
+  let wd = if workingDir.len == 0: getCurrentDir() else: workingDir
+  if not dirExists(wd):
+    raise newException(OSError, "Working directory does not exist: " & wd)
+  
+  try:
+    let (output, exitCode) = execCmdEx(command, workingDir = wd)
+    result = (output: output, exitCode: exitCode)
+  except OSError as e:
+    raise newException(OSError, "Failed to execute command '" & command & "': " & e.msg)
+
+proc assertExitCode*(exitCode: int, expected: int, msg: string = ""): bool =
+  ## Assert that an exit code matches the expected value
+  let matches = exitCode == expected
+  let errorMsg = if msg == "": "Exit code mismatch. Expected: " & $expected & ", Got: " & $exitCode else: msg
+  if not matches:
+    raise newException(AssertionDefect, errorMsg)
+  return matches
+
+proc assertOutputContains*(output: string, expected: string, msg: string = ""): bool =
+  ## Assert that command output contains specific text
+  let contains = expected in output
+  let errorMsg = if msg == "": "Output does not contain: " & expected else: msg
+  if not contains:
+    raise newException(AssertionDefect, errorMsg)
+  return contains
+
 # Export all public symbols
 export
   assertFileNotExists,
@@ -159,4 +201,7 @@ export
   assertFileModifiedAfter,
   runTestWithTimeout,
   assertThrows,
-  benchmark
+  benchmark,
+  runCliCommand,
+  assertExitCode,
+  assertOutputContains

@@ -1,10 +1,7 @@
 # Comprehensive example demonstrating nimtest capabilities
 
-import nimtest/api
+import ../src/nimtest/api
 import std/os
-
-# Configure project name (optional)
-ProjectName = "myapp"
 
 # Example 1: Basic file operations and assertions
 echo "=== Example 1: Basic File Operations ==="

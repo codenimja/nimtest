@@ -1,5 +1,5 @@
 # nimtest.nimble
-version       = "0.1.0"
+version       = "1.0.0"
 author        = "codenimja"
 description   = "A batteries-included testing framework for Nim – TestContext, file-system assertions, CLI testing, benchmarks, JUnit/Markdown reports, animated progress bars."
 license       = "MIT"
