@@ -300,7 +300,7 @@ nimtest is designed to work well in CI/CD environments:
 
 ## Roadmap
 
-nimtest has an ambitious roadmap for 2026 focused on usability, performance, and observability. See [ROADMAP.md](ROADMAP.md) for the complete strategic plan including:
+nimtest has an ambitious roadmap for 2026 focused on usability, performance, and observability. See [ROADMAP.md](docs/ROADMAP.md) for the complete strategic plan including:
 
 - **Q1 2026 (v1.1)**: Macro DSL for tests, CLI runner binary, enhanced assertions
 - **Q2 2026 (v1.2)**: Parallel execution, async/await support, E2E integration lanes
