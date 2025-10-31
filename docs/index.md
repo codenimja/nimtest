@@ -5,9 +5,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/codenimja/nimtest/ci.yml?branch=main&style=flat-square)](https://github.com/codenimja/nimtest/actions)
+[![Nimble Package](https://img.shields.io/badge/nimble-package-blue.svg?style=flat-square)](https://github.com/nim-lang/packages)
 [![nimble](https://img.shields.io/endpoint?url=https://nimble.directory/api/package-badge/nimtest)](https://nimble.directory/package/nimtest)
 [![CI](https://github.com/codenimja/nimtest/actions/workflows/ci.yml/badge.svg)](https://github.com/codenimja/nimtest/actions)
 [![nimpkgs](https://img.shields.io/endpoint?url=https://nimpkgs.ci/badge/nimtest)](https://nimpkgs.ci)
+[![Docs](https://img.shields.io/badge/docs-latest-blue)](https://codenimja.github.io/nimtest/)
 [![Docs](https://img.shields.io/badge/docs-latest-blue)](https://codenimja.github.io/nimtest/)
 
 **Install**: `nimble install nimtest`
