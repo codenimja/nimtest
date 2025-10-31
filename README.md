@@ -3,15 +3,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/codenimja/nimtest/ci.yml?branch=main&style=flat-square)](https://github.com/codenimja/nimtest/actions)
-[![Nimble Package](https://img.shields.io/badge/nimble-package-blue.svg?style=flat-square)](https://github.com/nim-lang/packages)
-[![nimble](https://img.shields.io/endpoint?url=https://nimble.directory/api/package-badge/nimtest)](https://nimble.directory/package/nimtest)
 [![CI](https://github.com/codenimja/nimtest/actions/workflows/ci.yml/badge.svg)](https://github.com/codenimja/nimtest/actions)
-[![nimpkgs](https://img.shields.io/endpoint?url=https://nimpkgs.ci/badge/nimtest)](https://nimpkgs.ci)
 [![Docs](https://img.shields.io/badge/docs-latest-blue)](https://codenimja.github.io/nimtest/)
 
 **"The only Nim test framework that ships with lock-free progress bars, JUnit reports, and a soul."**
 
-## One-Liner Hook
+## One-Liner Power
 
 ```bash
 # One command to test like a god:
@@ -25,8 +22,6 @@ nimble install nimtest && echo 'test "hello"' > tests/t_hello.nim && nimtest
 ```bash
 nimble install nimtest
 ```
-
-## One-Liner Power
 
 ```nim
 import nimtest/api
@@ -302,6 +297,17 @@ nimtest is designed to work well in CI/CD environments:
 6. **Clean up resources**: Always ensure temporary files and directories are cleaned up
 7. **Use performance utilities**: Measure and track performance of critical operations
 8. **Generate reports**: Use reporting utilities to track test results over time
+
+## Roadmap
+
+nimtest has an ambitious roadmap for 2026 focused on usability, performance, and observability. See [ROADMAP.md](ROADMAP.md) for the complete strategic plan including:
+
+- **Q1 2026 (v1.1)**: Macro DSL for tests, CLI runner binary, enhanced assertions
+- **Q2 2026 (v1.2)**: Parallel execution, async/await support, E2E integration lanes
+- **Q3 2026 (v1.3)**: Interactive HTML reports, coverage integration, fuzzing hooks
+- **Q4 2026+**: Wild cards including AI-assisted test generation and compile-time fuzzing
+
+**Contribute**: Help shape the future by participating in roadmap discussions on the [Nim Forum](https://forum.nim-lang.org/) or [GitHub Discussions](https://github.com/codenimja/nimtest/discussions).
 
 ## Dependencies
 
