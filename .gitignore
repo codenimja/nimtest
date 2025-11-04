@@ -3,6 +3,7 @@ nimcache/
 *.exe
 *.out
 *.app
+nimtest
 
 # Test artifacts
 test_report.*

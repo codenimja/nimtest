@@ -1,4 +1,4 @@
-# nimtest v1.0 — CI-Ready Testing with Lock-Free Progress Bars
+# nimtest v1.0.0 — CI-Ready Testing with Lock-Free Progress Bars
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Nim Version](https://img.shields.io/badge/Nim-2.0+-blue.svg?style=flat-square)](https://nim-lang.org/)
@@ -12,7 +12,7 @@
 
 ```bash
 # One command to test like a god:
-nimble install nimtest && echo 'test "hello"' > tests/t_hello.nim && nimtest
+nimble install nimtest && nimtest
 ```
 
 → Get started quickly with comprehensive testing utilities.
@@ -43,7 +43,7 @@ finally:
 | CLI Testing | `runCliCommand()`, `assertExitCode()` |
 | Perf Testing | `benchmark("op", 10_000): proc()` |
 | Reporting | `saveReport(rfJunit, "ci.xml")` |
-| Progress Bars | `pbsGlobe`, `pbsSpinner`, `pbsBar` — lock-free |
+| Progress Bars | `pbsGlobe`, `pbsPulse`, `pbsDots`, `pbsBlocks` — lock-free |
 | Cross-Platform | Linux, macOS, Windows |
 
 ## CI/CD Integration
@@ -59,7 +59,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: jiro4989/setup-nim-action@v2
       - run: nimble install nimtest
-      - run: nim c -r tests/all_tests.nim
+      - run: nim c -r examples/test_all.nim
       - uses: actions/upload-artifact@v3
         with:
           name: junit-report
@@ -152,7 +152,7 @@ Five different animated progress bar styles:
 let bar = newProgressBar(pbsGlobe, total = 100, message = "Processing...")
 for i in 0..99:
   # Do work
-  bar.update(i + 1)
+  updateProgress(bar, i + 1)
 bar.finish("Complete!")
 ```
 
@@ -244,7 +244,7 @@ benchmark("operation", 1000):
 let bar = newProgressBar(pbsGlobe, width = 40, total = 100, message = "Processing...")
 
 # Update progress
-bar.updateProgress(50, "Halfway done...")
+updateProgress(bar, 50, "Halfway done...")
 bar.display()
 
 # Complete progress bar
