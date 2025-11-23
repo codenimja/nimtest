@@ -4,7 +4,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: jiro4989/setup-nim-action@v2
       - run: nimble refresh
       - run: nim c -r tests/test_core.nim
