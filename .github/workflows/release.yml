@@ -15,7 +15,7 @@ jobs:
 
     - name: Cache nimble dependencies
       id: cache-nimble
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.nimble
         key: ubuntu-latest-nimble-stable-${{ hashFiles('nimble.nimble') }}
@@ -109,7 +109,7 @@ jobs:
 
     - name: Cache nimble dependencies
       id: cache-nimble
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.nimble
         key: ubuntu-latest-nimble-stable-${{ hashFiles('nimble.nimble') }}
