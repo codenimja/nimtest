@@ -29,11 +29,11 @@ jobs:
             </testsuite>
           </testsuites>
           EOF
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v6
         with:
           name: junit-report
           path: test-results.xml
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v6
         with:
           name: test-reports
           path: test_report*.json
